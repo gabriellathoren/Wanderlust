@@ -40,11 +40,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected	void onStart() { //Används när jag startar upp appen
+    protected void onStart() { //Används när jag startar upp appen
         super.onStart();
-        
+
         colIndex = getButtonColorIndex();
         //hämtar colIndex för att senare kunna sätta bakgrundsfärgen
+        //Detta värde är antingen 0 eller ett värde som är lagrat sedan innan
 
 
         Log.d(LOG_TAG, "   index: " + colIndex);
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //För att ändra färger på knappen:
-        switch (colIndex) {
+        switch (colIndex) { //Beroende på vilket colIndex det är sker något av casen
             case 1:
                 b.setBackgroundColor(getResources().getColor(R.color.red));
                 break;
@@ -88,18 +89,32 @@ public class MainActivity extends AppCompatActivity {
         colIndex++;
     }
 
+    /* Sparar nuvarande colIndex */
     public void saveButtonColorIndex() {
         SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        //Hämta SharedPreferences
+
         SharedPreferences.Editor editor = settings.edit();
+        //Hämta editor
+
         editor.putInt(COL_INDEX_KEY, colIndex);
+        //Med hjälp av editorn kastar jag in nuvarande colIndex
+
         editor.commit();
     }
 
     public int getButtonColorIndex() {
-        SharedPreferences settings =
-                getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        //Hämtar SharedPreferences
+
         Log.d(LOG_TAG, "   buttonColorIndex: " + colIndex);
+        //Loggar för att få info om det som sker
+
         int idx = settings.getInt(COL_INDEX_KEY, 0);
+        //Hämtar ut int för den färg som fanns innan, om det inte finns något lagrat är
+        //default-värdet 0
+
+
         return idx;
     }
 
