@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void setButtonColor() {
-        Button b = (Button) findViewById(R.id.nok_button);
+        Button b = (Button) findViewById(R.id.login_button);
         // Button är en knapp. B är en referens till en knapp.
         // Denna knapp refererar till nok_button och kopplas till den för att kunna ändra dess färg
 

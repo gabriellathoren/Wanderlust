@@ -7,30 +7,58 @@
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
     android:id="@+id/mainLayout">
 
-    <TextView android:text="@string/hello_text" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ok_button_text"
-        android:id="@+id/ok_button"
-        android:layout_below="@+id/textView"
+        android:text="@string/login_button_text"
+        android:id="@+id/login_button"
+        android:layout_marginBottom="135dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="43dp"
-        android:layout_marginTop="119dp" />
+        android:layout_alignParentEnd="true" />
 
-
-    <Button
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/nok_button_text"
-        android:id="@+id/nok_button"
-        android:layout_below="@+id/textView"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/usernameID"
+        android:layout_marginBottom="21dp"
+        android:layout_above="@+id/passwordID"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="83dp"
-        android:layout_marginTop="219dp"
-        android:onClick="notOkHandler"/>
+        android:text="username" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passwordID"
+        android:layout_marginBottom="41dp"
+        android:layout_above="@+id/login_button"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:text="password" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/forgotLogin"
+        android:layout_alignTop="@+id/login_button"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="61dp"
+        android:text="Have you forgotten your username or password? " />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/registerButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/forgotLogin"
+        android:layout_below="@+id/forgotLogin"
+        android:text="Don&apos;t have an account?" />
+
 
 </RelativeLayout>
