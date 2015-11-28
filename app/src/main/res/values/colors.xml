@@ -4,7 +4,21 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="red">#ffff0000</color>
-    <color name="schneebly">#e1e1e1e1</color>
-    <color name="annoy">#4050ff00</color>
+    <!-- Theme colors -->
+    <color name="primary_theme_color">#93e1d8</color>
+    <color name="lightblue_theme_color">#DDFFF7</color>
+    <color name="peach_theme_color">#FFA69E</color>
+    <color name="red_theme_color">#AA4465</color>
+    <color name="purple_theme_color">#861657</color>
+
+    <!-- Transparent colors -->
+    <color name="transparent_white">#66FFFFFF</color>
+
 </resources>
+
+
+<!-- Bakgrund
+
+    arab tile
+    arches
+    back pattern
