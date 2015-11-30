@@ -4,11 +4,12 @@
     <string name="app_name">Wanderlust</string>
 
     <!-- Log in activity -->
-    <string name="login_button_text">LOGGA IN</string>
-    <string name="login_register_text">Do not have an account?</string>
-    <string name="login_forgot_password_text">Have you forgotten your username or password?</string>
+    <string name="login_button_text">LOG IN</string>
+    <string name="login_register_text">REGISTER</string>
+    <string name="login_forgot_password_text">Forgot your username or password?</string>
     <string name="login_password_text">password</string>
     <string name="login_username_text">username</string>
+    <string name="icon_desc">appicon</string>
 
 
 

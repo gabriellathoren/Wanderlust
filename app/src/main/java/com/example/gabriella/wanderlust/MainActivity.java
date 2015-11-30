@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.view.Window;
 
 public class MainActivity extends AppCompatActivity {
 
