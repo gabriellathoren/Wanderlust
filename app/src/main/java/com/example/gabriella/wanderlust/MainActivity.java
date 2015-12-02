@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     /* Method for log in and show new activity */
     public void logIn(View view) {
         Intent intent = new Intent(this, StartPage.class);
+        startActivity(intent);
     }
-
 
 }

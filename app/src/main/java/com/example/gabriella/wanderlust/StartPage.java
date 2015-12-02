@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -49,10 +50,10 @@ public class StartPage extends AppCompatActivity {
 
         /* Adds toolbar to activity */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        ImageView mTitle = (ImageView) toolbar.findViewById(R.id.toolbar_title);
 
         /* Adds list to activity */
-        this.lAct.setListAdapter(new ArrayAdapter<String>(this, R.layout.travel_list,R.id.Itemname,itemname));
+        this.lAct.setListAdapter(new ArrayAdapter<String>(this, R.layout.travel_list, R.id.Itemname, itemname));
     }
 
 }

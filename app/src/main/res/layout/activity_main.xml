@@ -15,8 +15,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:layout_alignEnd="@+id/relativeLayout">
+        android:layout_centerVertical="true">
 
         <ImageView
             android:id="@+id/imageView"
@@ -34,12 +33,13 @@
             android:id="@+id/usernameID"
             android:labelFor="@+id/usernameID"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:ellipsize="start"
             android:hint="@string/login_username_text"
             android:inputType="textEmailAddress"
             android:background="@drawable/login_textfield_shape"
-            android:padding="15dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:textColor="@android:color/white"
             android:typeface="normal"
             android:focusable="true"
@@ -54,12 +54,13 @@
             android:id="@+id/passwordID"
             android:labelFor="@+id/passwordID"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:ellipsize="start"
             android:hint="@string/login_password_text"
             android:inputType="textPassword"
             android:background="@drawable/login_textfield_shape"
-            android:padding="15dp"
             android:textColor="@android:color/black"
             android:typeface="normal"
             android:focusable="true"
@@ -72,26 +73,25 @@
         <Button
             android:id="@+id/login_button"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:text="@string/login_button_text"
             android:layout_marginTop="20dp"
             android:fontFamily="Times New Roman"
             android:textSize="20sp"
-            android:padding="10dp"
+            android:padding="5dp"
             android:layout_below="@+id/passwordID"
             android:layout_alignParentStart="true"
             android:background="@drawable/login_button"
             android:textColor="@android:color/white"
-            android:onClick="login"/>
+            android:onClick="logIn"/>
 
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/relativeLayout">
+        android:layout_alignTop="@+id/forgotLogin"
+        android:layout_alignParentStart="true">
 
         <Button
             android:id="@+id/registerButton"
@@ -115,12 +115,12 @@
             android:layout_height="wrap_content"
             android:text="@string/login_forgot_password_text"
             android:textColor="@color/transparent_white99"
-            android:textSize="18sp"
+            android:textSize="12sp"
             android:background="@null"
             android:fontFamily="Times New Roman"
-            android:layout_marginBottom="103dp"
-            android:layout_above="@+id/registerButton"
-            android:layout_alignParentStart="true" />
+            android:layout_marginBottom="154dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignStart="@+id/registerButton" />
     </RelativeLayout>
 
 
