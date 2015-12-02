@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!-- Appearance for the startpage -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".StartPage"
+    android:id="@+id/startLayout">
+
+    <!-- Includes the toolbar in the activity -->
+    <include
+        android:id="@+id/tool_bar"
+        android:layout="@layout/tool_bar">
+    </include>
+
+    <!-- List for the travels -->
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="{relativePackage}.${activityClass}"
+        android:layout_below="@+id/tool_bar"
+        android:layout_alignParentBottom="true">
+
+        <ListView
+            android:id="@+id/travellist"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

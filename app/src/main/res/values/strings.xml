@@ -3,13 +3,19 @@
     <!-- Header -->
     <string name="app_name">Wanderlust</string>
 
-    <!-- Log in activity -->
+    <!-- Strings for log in activity -->
     <string name="login_button_text">LOG IN</string>
     <string name="login_register_text">REGISTER</string>
     <string name="login_forgot_password_text">Forgot your username or password?</string>
     <string name="login_password_text">password</string>
     <string name="login_username_text">username</string>
     <string name="icon_desc">appicon</string>
+
+
+    <!-- Strings for toolbar -->
+    <string name="settings_desc">setting icon</string>
+    <string name="toolbar_title_desc">logo name</string>
+
 
 
 

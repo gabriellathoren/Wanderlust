@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:id="@+id/mainLayout"
@@ -80,7 +81,8 @@
             android:layout_below="@+id/passwordID"
             android:layout_alignParentStart="true"
             android:background="@drawable/login_button"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:onClick="login"/>
 
     </RelativeLayout>
 
@@ -103,7 +105,7 @@
             android:padding="15dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:textColor="@color/lightgrey"
+            android:textColor="@color/lightpurple"
             />
 
         <Button
@@ -116,10 +118,9 @@
             android:textSize="18sp"
             android:background="@null"
             android:fontFamily="Times New Roman"
-            android:layout_marginBottom="104dp"
+            android:layout_marginBottom="103dp"
             android:layout_above="@+id/registerButton"
-            android:layout_alignStart="@+id/registerButton"
-            />
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 
