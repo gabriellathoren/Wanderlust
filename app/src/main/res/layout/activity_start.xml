@@ -12,24 +12,50 @@
     <!-- Includes the toolbar in the activity -->
     <include
         android:id="@+id/tool_bar"
-        android:layout="@layout/tool_bar">
+        layout="@layout/tool_bar">
     </include>
 
-    <!-- List for the travels -->
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <!-- Travel list -->
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="{relativePackage}.${activityClass}"
-        android:layout_below="@+id/tool_bar"
-        android:layout_alignParentBottom="true">
+        android:layout_height="200dp"
+        android:layout_below="@id/tool_bar"
+        >
 
-        <ListView
-            android:id="@+id/travellist"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="travelLayout"
+            android:alpha="0.7"
+            >
+            <!--android:background="@drawable/wallpaper"-->
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:text="PARIS"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:text="7"
+                android:textColor="#000"
+                android:textSize="100dp"
+                android:layout_below="@+id/title"
+                android:layout_centerHorizontal="true" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
 </RelativeLayout>

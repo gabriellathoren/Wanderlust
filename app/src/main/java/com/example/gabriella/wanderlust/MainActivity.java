@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.view.Window;
 import android.content.Intent;
+import java.util.EventListener;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -26,16 +27,32 @@ public class MainActivity extends AppCompatActivity {
     // hämtas den information som behövs.
 
 
-     @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
 
-    /* Method for log in and show new activity */
+    /*
+    Button btn1 = (Button) findViewById(R.id.login_button);
+    btn1.setOnClickListener(new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            setContentView(R.layout.activity_start);
+        }
+    });
+
+    /* Method for log in and show new activity*/
     public void logIn(View view) {
         Intent intent = new Intent(this, StartPage.class);
         startActivity(intent);
+        //setContentView(R.layout.activity_start);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
 }
