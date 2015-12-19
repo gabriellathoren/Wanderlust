@@ -45,9 +45,6 @@ import java.util.List;
 
 public class StartPage extends AppCompatActivity {
 
-    TextView title;
-    TextView days;
-    ImageView background;
     private List<Travel> travels;
     private RecyclerView rv;
 
@@ -96,6 +93,7 @@ public class StartPage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /* Creates list of travels with data */
     private List<Travel> createList(int size) {
 
         List<Travel> result = new ArrayList<Travel>();
@@ -106,13 +104,12 @@ public class StartPage extends AppCompatActivity {
             t.background = R.drawable.wallpaper;
 
             result.add(t);
-
         }
-
         return result;
     }
 
 
+    /* Sets adapter */
     private void initializeAdapter(){
         RVAdapter adapter = new RVAdapter(travels);
         rv.setAdapter(adapter);

@@ -64,9 +64,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
 
         TravelViewHolder(View itemView) {
             super(itemView);
-            cv = (CardView)itemView.findViewById(R.id.card_view);
+            cv    = (CardView)itemView.findViewById(R.id.card_view);
             title = (TextView)itemView.findViewById(R.id.title);
-            days = (TextView)itemView.findViewById(R.id.days);
+            days  = (TextView)itemView.findViewById(R.id.days);
             background = (ImageView)itemView.findViewById(R.id.background);
         }
     }
