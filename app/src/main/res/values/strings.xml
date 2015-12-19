@@ -16,4 +16,6 @@
     <string name="settings_desc">setting icon</string>
     <string name="toolbar_title_desc">logo name</string>
 
+    <!-- Strings for StartPage -->
+    <string name="action_settings">Settings</string>
 </resources>
