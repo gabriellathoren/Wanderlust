@@ -22,7 +22,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
     private List<Travel> travels;
 
     /* Constructor to the custom adapter that handle the data that the RecyclerView displays */
-    RVAdapter(List<Travel> travels){
+    public RVAdapter(List<Travel> travels){
         this.travels = travels;
     }
 
@@ -75,6 +75,5 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
-
 
 }

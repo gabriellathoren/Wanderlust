@@ -47,6 +47,7 @@ public class StartPage extends AppCompatActivity {
 
     private List<Travel> travels;
     private RecyclerView rv;
+    private RVAdapter ra;
 
     private final static String LOG_TAG = StartPage.class.getSimpleName();
 
@@ -60,14 +61,15 @@ public class StartPage extends AppCompatActivity {
          setContentView(R.layout.activity_start);
 
          /* Create RecyclerView for listing travels */
-         RecyclerView rv = (RecyclerView)findViewById(R.id.rv);
+         rv = (RecyclerView)findViewById(R.id.rv);
          rv.setHasFixedSize(true);
 
          /* Create LayoutManager and Adapter which RecyclerView require */
          LinearLayoutManager llm = new LinearLayoutManager(this);
          llm.setOrientation(LinearLayoutManager.VERTICAL);
          rv.setLayoutManager(llm);
-         RVAdapter ra = new RVAdapter(createList(3)); /* Create list with the amount of objects the user has */
+         travels = createList(3); /* Create list with the amount of objects the user has */
+         ra = new RVAdapter(travels);
          rv.setAdapter(ra);
 
     }
@@ -99,22 +101,14 @@ public class StartPage extends AppCompatActivity {
         List<Travel> result = new ArrayList<Travel>();
         for (int i=1; i <= size; i++) {
             Travel t = new Travel();
+            t.background = R.drawable.wallpaper;
             t.title = "Paris";
             t.days = "3";
-            t.background = R.drawable.wallpaper;
 
             result.add(t);
         }
         return result;
     }
-
-
-    /* Sets adapter */
-    private void initializeAdapter(){
-        RVAdapter adapter = new RVAdapter(travels);
-        rv.setAdapter(adapter);
-    }
-
 
     @Override
     protected void onStart() {
