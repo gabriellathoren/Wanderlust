@@ -135,11 +135,11 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, user.getUser_ID());
-        values.put(KEY_USER_USERNAME, user.getUsername());
-        values.put(KEY_USER_PASSWORD, user.getPassword());
+        values.put(KEY_USER_ID,         user.getUser_ID());
+        values.put(KEY_USER_USERNAME,   user.getUsername());
+        values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirst_name());
-        values.put(KEY_USER_LAST_NAME, user.getLast_name());
+        values.put(KEY_USER_LAST_NAME,  user.getLast_name());
 
         /* Insert row */
         db.insert(TABLE_USER, null, values);
@@ -149,12 +149,11 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     /* Delete a user */
     public void deleteUser(long user_id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_USER, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user_id)});
+        db.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(user_id)});
     }
 
 
-    /* Update user information
+    /* Update user information */
     public void updateUser(int id, String username, String password, String firstname, String lastname) {
         SQLiteDatabase db = this.getWritableDatabase();
         DBUser user;
@@ -167,10 +166,9 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         values.put(KEY_USER_LAST_NAME,  lastname);
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                  new String[] { String.valueOf(user.getUser_ID())});
-    }
-    */
+                  new String[] { String.valueOf(id)});
 
+    }
 
 
     /* Get user information by id */
@@ -190,7 +188,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
         DBUser u = new DBUser();
         u.setUser_ID(c.getInt(c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername((c.getString(c.getColumnIndex(KEY_USER_USERNAME))));
+        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
         u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
         u.setFirst_name(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
         u.setLast_name(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
