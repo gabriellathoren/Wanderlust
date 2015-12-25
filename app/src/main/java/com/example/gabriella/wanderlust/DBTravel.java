@@ -7,7 +7,7 @@ package com.example.gabriella.wanderlust;
  */
 public class DBTravel {
 
-    int travel_ID;
+    int travelID;
     String title;
     int year;
     int month;
@@ -18,7 +18,7 @@ public class DBTravel {
     DBTravel(){}
 
     DBTravel(int travel_ID, String title, int year, int month, int day, int photo){
-        this.travel_ID = travel_ID;
+        this.travelID = travel_ID;
         this.title = title;
         this.year = year;
         this.month = month;
@@ -28,8 +28,8 @@ public class DBTravel {
 
 
     /* Setters */
-    public void setTravel_ID(int id) {
-        this.travel_ID = id;
+    public void setTravelID(int id) {
+        this.travelID = id;
     }
 
     public void setTitle(String title){
@@ -54,8 +54,8 @@ public class DBTravel {
 
 
     /* Getters */
-    public int getTravel_ID() {
-        return this.travel_ID;
+    public int getTravelID() {
+        return this.travelID;
     }
 
     public String getTitle(){

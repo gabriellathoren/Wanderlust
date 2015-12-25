@@ -7,7 +7,7 @@ package com.example.gabriella.wanderlust;
  */
 public class DBUser {
 
-    int user_ID;
+    int userID;
     String username;
     String password;
     String first_name;
@@ -17,7 +17,7 @@ public class DBUser {
     public DBUser(){}
 
     public DBUser(int user_ID, String username, String password, String first_name, String last_name) {
-        this.user_ID    = user_ID;
+        this.userID    = user_ID;
         this.username   = username;
         this.password   = password;
         this.first_name = first_name;
@@ -25,8 +25,8 @@ public class DBUser {
     }
 
     /* Setters */
-    public void setUser_ID(int id) {
-        this.user_ID = id;
+    public void setUserID(int id) {
+        this.userID = id;
     }
 
     public void setUsername(String username){
@@ -37,18 +37,18 @@ public class DBUser {
         this.password = password;
     }
 
-    public void setFirst_name(String first_name) {
+    public void setFirstName(String first_name) {
         this.first_name = first_name;
     }
 
-    public void setLast_name(String last_name) {
+    public void setLastName(String last_name) {
         this.last_name = last_name;
     }
 
 
     /* Getters */
-    public int getUser_ID() {
-        return this.user_ID;
+    public int getUserID() {
+        return this.userID;
     }
 
     public String getUsername(){
@@ -59,11 +59,11 @@ public class DBUser {
         return this.password;
     }
 
-    public String getFirst_name() {
+    public String getFirstName() {
         return this.first_name;
     }
 
-    public String getLast_name() {
+    public String getLastName() {
         return this.last_name;
     }
 

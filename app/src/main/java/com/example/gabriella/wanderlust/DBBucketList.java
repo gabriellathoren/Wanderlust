@@ -21,11 +21,11 @@ public class DBBucketList {
     }
 
     /* Setters */
-    public void setList_ID(int id) {
+    public void setListID(int id) {
         this.list_ID = id;
     }
 
-    public void setTravel_ID(int travel_ID){
+    public void setTravelID(int travel_ID){
         this.travel_ID = travel_ID;
     }
 
@@ -34,11 +34,11 @@ public class DBBucketList {
     }
 
     /* Getters */
-    public int getList_ID() {
+    public int getListID() {
         return this.list_ID;
     }
 
-    public int getTravel_ID(){
+    public int getTravelID(){
         return this.travel_ID;
     }
 
