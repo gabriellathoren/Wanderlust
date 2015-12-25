@@ -7,7 +7,7 @@ package com.example.gabriella.wanderlust;
  */
 public class DBUser {
 
-    int userID;
+    int userID; /* Behövs den här verkligen? */
     String username;
     String password;
     String first_name;
@@ -16,8 +16,7 @@ public class DBUser {
     /* Constructors */
     public DBUser(){}
 
-    public DBUser(int user_ID, String username, String password, String first_name, String last_name) {
-        this.userID    = user_ID;
+    public DBUser(String username, String password, String first_name, String last_name) {
         this.username   = username;
         this.password   = password;
         this.first_name = first_name;

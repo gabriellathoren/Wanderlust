@@ -9,9 +9,13 @@ package com.example.gabriella.wanderlust;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SQLiteHelper extends SQLiteOpenHelper{
@@ -134,25 +138,32 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     }
 
     /* Create a user */
-    public long createUser(DBUser user) {
+    public void createUser(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        /* Set userID */
+        Cursor c = db.rawQuery("SELECT count(*) FROM " + TABLE_USER, null);
+        c.moveToFirst();
+        int count = (c.getInt(0) + 1);
+
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, user.getUserID());
+        values.put(KEY_USER_ID,         count);
         values.put(KEY_USER_USERNAME,   user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
         values.put(KEY_USER_LAST_NAME,  user.getLastName());
 
         /* Insert row */
-        return db.insert(TABLE_USER, null, values);
-
+        db.insert(TABLE_USER, null, values);
+        db.close();
+        c.close();
     }
 
     /* Delete a user */
     public void deleteUser(long user_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(user_id)});
+        db.close();
     }
 
 
@@ -167,7 +178,9 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         values.put(KEY_USER_LAST_NAME,  user.getLastName());
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                  new String[] { String.valueOf(user.getUserID())});
+                new String[]{String.valueOf(user.getUserID())});
+
+        db.close();
 
     }
 
@@ -195,6 +208,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
 
         c.close();
+        db.close();
 
         return u;
     }
@@ -222,13 +236,47 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
 
         c.close();
+        db.close();
 
         return u;
     }
 
+    /* Create a travel */
+    public void createTravel(DBTravel travel, DBUser user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selectQuery = "SELECT count(*) FROM " + TABLE_TRAVEL + ", " + TABLE_USER_TRAVEL  + " "
+                           + "WHERE " + TABLE_TRAVEL      + "." + KEY_TRAVEL_ID + " = " + TABLE_USER_TRAVEL + "." + KEY_TRAVEL_ID + " "
+                           + "AND "   + TABLE_USER_TRAVEL + "." + KEY_USER_ID   + " = " + user.getUserID();
+
+        /* Set travelID */
+        Cursor c = db.rawQuery(selectQuery, null);
+        c.moveToFirst();
+        int count = (c.getInt(0) + 1);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TRAVEL_ID,        count);
+        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
+        values.put(KEY_TRAVEL_YEAR,      travel.getYear());
+        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
+        values.put(KEY_TRAVEL_DAY,       travel.getDay());
+        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaper());
+
+        /* Insert row */
+        db.insert(TABLE_USER, null, values);
+
+        db.close();
+        c.close();
+    }
+
+
+
+
+
+
 
     /* Create a country */
-    public long createCountry(DBCountry country) {
+    public void createCountry(DBCountry country) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -236,7 +284,8 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         values.put(KEY_COUNTRY_CONTINENT, country.getContinent());
 
         /* Insert row */
-        return db.insert(TABLE_COUNTRY, null, values);
+        db.insert(TABLE_COUNTRY, null, values);
+        db.close();
     }
 
 
@@ -635,15 +684,15 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     }
 
 
-    /* Get the involved country in the travel */
-    public DBCountry getCountry(int travelID) {
+    /* Get the involved countries in the travel */
+    public List<DBCountry> getCountries(int travelID) {
         SQLiteDatabase db = this.getReadableDatabase();
-
+        List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT " + KEY_COUNTRY_NAME     + " "
                            +  "FROM "   + TABLE_COUNTRY        + ","
                                         + TABLE_TRAVEL_COUNTRY + ","
-                                        + TABLE_COUNTRY
+                                        + TABLE_TRAVEL        + " "
                            +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
                            +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
                            +  "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID    + "=" + travelID);
@@ -652,46 +701,201 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        if (c != null) {
-            c.moveToFirst();
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+
+            }
+            while (c.moveToNext());
         }
 
-        DBCountry country = new DBCountry();
-        country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-        country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+        c.close();
+        db.close();
+        return countries;
+    }
+
+    /* Get/list all countries in Africa */
+    public List<DBCountry> getAllCountriesAfrica() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
+
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
+                           +  "FROM "     + TABLE_COUNTRY        + ", "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+
+            }
+            while (c.moveToNext());
+        }
 
         c.close();
-        return country;
+        db.close();
+        return countries;
     }
 
-    /* Get/list all countries */
+    /* Get/list all countries in Asia */
+    public List<DBCountry> getAllCountriesAsia() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
 
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
+                           +  "FROM "     + TABLE_COUNTRY        + ", "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
+        Log.e(LOG, selectQuery);
 
+        Cursor c = db.rawQuery(selectQuery, null);
 
-    /* Create a travel */
-    public void createTravel(DBTravel travel) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_ID, travel.getTravelID());
-        values.put(KEY_TRAVEL_TITLE, travel.getTitle());
-        values.put(KEY_TRAVEL_YEAR, travel.getYear());
-        values.put(KEY_TRAVEL_MONTH, travel.getMonth());
-        values.put(KEY_TRAVEL_DAY, travel.getDay());
-        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaper());
+            }
+            while (c.moveToNext());
+        }
 
-        /* Insert row */
-        long user_id = db.insert(TABLE_USER, null, values);
+        c.close();
+        db.close();
+        return countries;
     }
 
+    /* Get/list all countries in Europe */
+    public List<DBCountry> getAllCountriesEurope() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
 
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
+                           +  "FROM "     + TABLE_COUNTRY        + ", "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Europe' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
+        Log.e(LOG, selectQuery);
 
+        Cursor c = db.rawQuery(selectQuery, null);
 
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
 
+            }
+            while (c.moveToNext());
+        }
 
+        c.close();
+        db.close();
+        return countries;
+    }
 
+    /* Get/list all countries in North America */
+    public List<DBCountry> getAllCountriesNorthAmerica() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
+
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
+                           +  "FROM "     + TABLE_COUNTRY        + ", "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'North America' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+
+            }
+            while (c.moveToNext());
+        }
+
+        c.close();
+        db.close();
+        return countries;
+    }
+
+    /* Get/list all countries in Oceania */
+    public List<DBCountry> getAllCountriesOceania() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
+
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
+                           +  "FROM "     + TABLE_COUNTRY        + ", "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+
+            }
+            while (c.moveToNext());
+        }
+
+        c.close();
+        db.close();
+        return countries;
+    }
+
+    /* Get/list all countries in South America */
+    public List<DBCountry> getAllCountriesSouthAmerica() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
+
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
+                +  "FROM "     + TABLE_COUNTRY        + ", "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'South America' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+
+            }
+            while (c.moveToNext());
+        }
+
+        c.close();
+        db.close();
+        return countries;
+    }
 
 }
 

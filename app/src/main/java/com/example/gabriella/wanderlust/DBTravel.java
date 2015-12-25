@@ -7,7 +7,7 @@ package com.example.gabriella.wanderlust;
  */
 public class DBTravel {
 
-    int travelID;
+    int travelID; /* Behövs den här? */
     String title;
     int year;
     int month;
@@ -17,8 +17,7 @@ public class DBTravel {
     /* Constructors */
     DBTravel(){}
 
-    DBTravel(int travel_ID, String title, int year, int month, int day, int photo){
-        this.travelID = travel_ID;
+    DBTravel(String title, int year, int month, int day, int photo){
         this.title = title;
         this.year = year;
         this.month = month;
