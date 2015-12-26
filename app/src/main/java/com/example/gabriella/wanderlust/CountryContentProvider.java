@@ -1,404 +1,52 @@
 package com.example.gabriella.wanderlust;
 
-/**
- * Created by Gabriella on 2015-12-23.
- *
- * This class handles the database
- */
-
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
+import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class SQLiteHelper extends SQLiteOpenHelper{
-
-    /* Logcat tag */
-    private static final String LOG = "DatabaseHelper";
-
-    /* Database version */
-    private static final int DATABASE_VERSION = 1;
-
-    /* Database name */
-    private static final String DATABASE_NAME = "database";
-
-    /* Table names */
-    private static final String TABLE_USER           = "user";
-    private static final String TABLE_COUNTRY        = "country";
-    private static final String TABLE_TRAVEL         = "travel";
-    private static final String TABLE_USER_TRAVEL    = "user_travel";
-    private static final String TABLE_TRAVEL_COUNTRY = "travel_country";
-    private static final String TABLE_BUCKET_LIST    = "bucket_list";
-
-    /* User table - column names */
-    private static final String KEY_USER_ID         = "user_ID";
-    private static final String KEY_USER_USERNAME   = "username";
-    private static final String KEY_USER_PASSWORD   = "password";
-    private static final String KEY_USER_FIRST_NAME = "first_name";
-    private static final String KEY_USER_LAST_NAME  = "last_name";
-
-    /* Country table - column names */
-    private static final String KEY_COUNTRY_NAME      = "country";
-    private static final String KEY_COUNTRY_CONTINENT = "continent";
-
-    /* Travel table - column names */
-    private static final String KEY_TRAVEL_ID        = "travel_ID";
-    private static final String KEY_TRAVEL_TITLE     = "title";
-    private static final String KEY_TRAVEL_YEAR      = "year";
-    private static final String KEY_TRAVEL_MONTH     = "month";
-    private static final String KEY_TRAVEL_DAY       = "day";
-    private static final String KEY_TRAVEL_WALLPAPER = "wallpaper";
-
-    /* Bucket_List table - column names */
-    private static final String KEY_LIST_ID = "list_ID";
-    private static final String KEY_ITEM = "item";
+/**
+ *  A ContentProvider for accessing the table country in the database
 
 
-    /* Table create statements */
-    private static final String CREATE_TABLE_USER = "create table " + TABLE_USER + "("
-            + KEY_USER_ID + " INTEGER PRIMARY KEY, "
-            + KEY_USER_USERNAME   + " TEXT NOT NULL UNIQUE, "
-            + KEY_USER_PASSWORD   + " TEXT NOT NULL, "
-            + KEY_USER_FIRST_NAME + " TEXT, "
-            + KEY_USER_LAST_NAME  + " TEXT)";
+public class CountryContentProvider extends ContentProvider{
 
-    private static final String CREATE_TABLE_COUNTRY = "create table " + TABLE_COUNTRY + "("
-            + KEY_COUNTRY_NAME      + " TEXT PRIMARY KEY, "
-            + KEY_COUNTRY_CONTINENT + " TEXT)";
+    /* Database
+    private CountryDatabaseHelper database;
 
-    private static final String CREATE_TABLE_TRAVEL = "create table " + TABLE_TRAVEL + "("
-            + KEY_TRAVEL_ID        + " INTEGER PRIMARY KEY, "
-            + KEY_TRAVEL_TITLE     + " TEXT, "
-            + KEY_TRAVEL_YEAR      + " INTEGER NOT NULL, "
-            + KEY_TRAVEL_MONTH     + " INTEGER NOT NULL, "
-            + KEY_TRAVEL_DAY       + " INTEGER NOT NULL, "
-            + KEY_TRAVEL_WALLPAPER + " INTEGER)";
+    private static final String AUTHORITY = "com.example.gabriella.wanderlust";
 
-    private static final String CREATE_TABLE_USER_TRAVEL = "create table " + TABLE_USER_TRAVEL + "("
-            + KEY_USER_ID   + " INTEGER PRIMARY KEY, "
-            + KEY_TRAVEL_ID + " INTEGER PRIMARY KEY,"
-            + "FOREIGN KEY (" + KEY_USER_ID + ") REFERENCES " + TABLE_USER + "(" + KEY_USER_ID + "), "
-            + "FOREIGN KEY (" + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
+    private static final String BASE_PATH = "todos";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
+            + "/" + BASE_PATH);
 
-    private static final String CREATE_TABLE_TRAVEL_COUNTRY = "create table " + TABLE_TRAVEL_COUNTRY + "("
-            + KEY_COUNTRY_NAME + " TEXT PRIMARY KEY, "
-            + KEY_TRAVEL_ID    + " INTEGER PRIMARY KEY, "
-            + "FOREIGN KEY ("  + KEY_COUNTRY_NAME + ") REFERENCES " + TABLE_COUNTRY + "(" + KEY_COUNTRY_NAME + "), "
-            + "FOREIGN KEY ("  + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
+    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+            + "/todos";
+    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+            + "/todo";
 
-    private static final String CREATE_TABLE_BUCKET_LIST = "create table " + TABLE_BUCKET_LIST + "("
-            + KEY_LIST_ID   + " INTEGER PRIMARY KEY, "
-            + KEY_TRAVEL_ID + " INTEGER, "
-            + KEY_ITEM      + " TEXT, "
-            + "FOREIGN KEY (" + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
-
-
-
-    /* Constructor */
-    public SQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    static {
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH, TODOS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", TODO_ID);
     }
+
 
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
-
-        /* Create tables */
-        db.execSQL(CREATE_TABLE_USER);
-        db.execSQL(CREATE_TABLE_COUNTRY);
-        db.execSQL(CREATE_TABLE_TRAVEL);
-        db.execSQL(CREATE_TABLE_USER_TRAVEL);
-        db.execSQL(CREATE_TABLE_TRAVEL_COUNTRY);
-        db.execSQL(CREATE_TABLE_BUCKET_LIST);
-
-        /* Set values in table country */
-        setCountries();
+    public boolean onCreate() {
+        database = new CountryDatabaseHelper(getContext());
+        return false;
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        /* Drop older tables while upgrading */
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_COUNTRY);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_TRAVEL);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_USER_TRAVEL);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_TRAVEL_COUNTRY);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_BUCKET_LIST);
-
-        /* Create new tables */
-        onCreate(db);
-
-    }
-
-
-
-    /* METHODS FOR ACCESSING THE TABLE USER */
-
-
-    /* Create a user */
-    public void createUser(DBUser user) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        /* Set userID */
-        Cursor c = db.rawQuery("SELECT count(*) FROM " + TABLE_USER, null);
-        c.moveToFirst();
-        int count = (c.getInt(0) + 1);
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID,         count);
-        values.put(KEY_USER_USERNAME, user.getUsername());
-        values.put(KEY_USER_PASSWORD, user.getPassword());
-        values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
-
-        /* Insert row */
-        db.insert(TABLE_USER, null, values);
-        db.close();
-        c.close();
-    }
-
-    /* Delete a user */
-    public void deleteUser(long user_id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(user_id)});
-        db.close();
-    }
-
-
-    /* Update user information */
-    public void updateUser(DBUser user) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_USERNAME, user.getUsername());
-        values.put(KEY_USER_PASSWORD, user.getPassword());
-        values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
-
-        db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getUserID())});
-
-        db.close();
-
-    }
-
-
-    /* Get user information by id */
-    public DBUser getUser(long user_id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String selectQuery = "SELECT * FROM " + TABLE_USER + " WHERE "
-                             + KEY_USER_ID + " = " + user_id;
-
-        Log.e(LOG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        if (c != null) {
-            c.moveToFirst();
-        }
-
-        DBUser u = new DBUser();
-        u.setUserID(c.getInt(c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
-        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
-        u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
-        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
-
-        c.close();
-        db.close();
-
-        return u;
-    }
-
-    /* Get user information by username */
-    public DBUser getUser(String username) {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String selectQuery = "SELECT * FROM " + TABLE_USER + " "
-                           + "WHERE " + KEY_USER_USERNAME + " = '" + username + "'";
-
-        Log.e(LOG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        if (c != null) {
-            c.moveToFirst();
-        }
-
-        DBUser u = new DBUser();
-        u.setUserID(c.getInt(c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
-        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
-        u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
-        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
-
-        c.close();
-        db.close();
-
-        return u;
-    }
-
-    /* Check if user exists */
-    public Boolean ifUserExists(String username, String password) {
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String selectQuery = "SELECT * FROM " + TABLE_USER + " "
-                           + "WHERE " + KEY_USER_USERNAME  + " = '" + username + "' "
-                           + "AND "   + KEY_USER_PASSWORD  + " = '" + password + "'";
-
-        Log.e(LOG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        /* Check if user does not exist */
-        if (c.getCount() <= 0) {
-            c.close();
-            return false;
-        }
-
-        c.close();
-
-        /* User exists */
-        return true;
-    }
-
-
-    /* METHODS FOR ACCESSING THE TABLE TRAVEL */
-
-    /* Create a travel */
-    public void createTravel(DBTravel travel, DBUser user, List<DBCountry> countries) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String selectQuery = "SELECT count(*) FROM " + TABLE_TRAVEL + ", " + TABLE_USER_TRAVEL  + " "
-                           + "WHERE " + TABLE_TRAVEL      + "." + KEY_TRAVEL_ID + " = " + TABLE_USER_TRAVEL + "." + KEY_TRAVEL_ID + " "
-                           + "AND "   + TABLE_USER_TRAVEL + "." + KEY_USER_ID   + " = " + user.getUserID();
-
-        /* Set travelID */
-        Cursor c = db.rawQuery(selectQuery, null);
-        c.moveToFirst();
-        int count = (c.getInt(0) + 1);
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_ID,        count);
-        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
-        values.put(KEY_TRAVEL_YEAR, travel.getYear());
-        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
-        values.put(KEY_TRAVEL_DAY,       travel.getDay());
-        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaper());
-
-        /* Insert row to the table user*/
-        db.insert(TABLE_USER, null, values);
-
-        /* Add row to table user_travel */
-        createUserTravel(user.getUserID(), travel.getTravelID());
-
-        /* Add row to the table travel_country which connects travel to country */
-        for(int i=0; i<countries.size(); i++) {
-            createTravelCountry(countries.get(i).getCountry(), travel.getTravelID());
-        }
-
-        /* Close database and cursor */
-        db.close();
-        c.close();
-    }
-
-    /* Add row to the table travel_country which connects travel to countries */
-    public void createTravelCountry(String country, long travelID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_COUNTRY_NAME, country);
-        values.put(KEY_TRAVEL_ID,    travelID);
-
-        /* Adds row */
-        db.insert(TABLE_TRAVEL_COUNTRY, null, values);
-
-        /* Close database */
-        db.close();
-
-    }
-
-    /* Add row to the table user_travel which connects user to travel */
-    public void createUserTravel(long userID, long travelID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, userID);
-        values.put(KEY_TRAVEL_ID, travelID);
-
-        /* Adds row */
-        db.insert(TABLE_USER_TRAVEL, null, values);
-
-        /* Close database */
-        db.close();
-    }
-
-    /* Delete travel */
-    public void deleteTravel(long travelID, long userID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travelID)});
-        db.close();
-
-        /* Delete related travel_user */
-        deleteUserTravel(travelID, userID);
-
-        /* Delete related travel_country */
-        deleteTravelCountry(travelID);
-    }
-
-    /* Delete user_travel */
-    public void deleteUserTravel(long travelID, long userID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_USER_TRAVEL,
-                  KEY_TRAVEL_ID + " = ? AND " +
-                  KEY_USER_ID + " = ?",
-                  new String[]{String.valueOf(travelID), String.valueOf(userID)});
-        db.close();
-    }
-
-    /* Delete travel_user */
-    public void deleteTravelCountry(long travelID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TRAVEL_COUNTRY, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travelID)});
-        db.close();
-    }
-
-
-    /* Update travel information */
-    public void updateTravel(DBUser user) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_USERNAME, user.getUsername());
-        values.put(KEY_USER_PASSWORD, user.getPassword());
-        values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
-
-        db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getUserID())});
-
-        db.close();
-
-    }
-
-
-
-
-
-
-    /* METHODS FOR ACCESSING THE TABLE COUNTRY */
-
-    /* Create a country */
+    /* Create a country
     public void createCountry(DBCountry country) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -406,13 +54,13 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         values.put(KEY_COUNTRY_NAME, country.getCountry());
         values.put(KEY_COUNTRY_CONTINENT, country.getContinent());
 
-        /* Insert row */
+        /* Insert row
         db.insert(TABLE_COUNTRY, null, values);
         db.close();
     }
 
 
-    /* Add all countries of the world to table */
+    /* Add all countries of the world to table
     public void setCountries() {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -807,24 +455,24 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     }
 
 
-    /* Get the involved countries in the travel */
+    /* Get the involved countries in the travel
     public List<DBCountry> getCountries(int travelID) {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT " + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "   + TABLE_COUNTRY        + ","
-                                        + TABLE_TRAVEL_COUNTRY + ","
-                                        + TABLE_TRAVEL        + " "
-                           +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
-                           +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
-                           +  "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
+                +  "FROM "   + TABLE_COUNTRY        + ","
+                + TABLE_TRAVEL_COUNTRY + ","
+                + TABLE_TRAVEL        + " "
+                +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
+                +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
+                +  "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID    + "=" + travelID);
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -840,21 +488,21 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return countries;
     }
 
-    /* Get/list all countries in Africa */
+    /* Get/list all countries in Africa
     public List<DBCountry> getAllCountriesAfrica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "     + TABLE_COUNTRY        + ", "
-                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
-                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+                +  "FROM "     + TABLE_COUNTRY        + ", "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -870,21 +518,21 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return countries;
     }
 
-    /* Get/list all countries in Asia */
+    /* Get/list all countries in Asia
     public List<DBCountry> getAllCountriesAsia() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "     + TABLE_COUNTRY        + ", "
-                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
-                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+                +  "FROM "     + TABLE_COUNTRY        + ", "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -900,21 +548,21 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return countries;
     }
 
-    /* Get/list all countries in Europe */
+    /* Get/list all countries in Europe
     public List<DBCountry> getAllCountriesEurope() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "     + TABLE_COUNTRY        + ", "
-                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Europe' "
-                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+                +  "FROM "     + TABLE_COUNTRY        + ", "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Europe' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -930,21 +578,21 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return countries;
     }
 
-    /* Get/list all countries in North America */
+    /* Get/list all countries in North America
     public List<DBCountry> getAllCountriesNorthAmerica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "     + TABLE_COUNTRY        + ", "
-                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'North America' "
-                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+                +  "FROM "     + TABLE_COUNTRY        + ", "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'North America' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -960,21 +608,21 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return countries;
     }
 
-    /* Get/list all countries in Oceania */
+    /* Get/list all countries in Oceania
     public List<DBCountry> getAllCountriesOceania() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "     + TABLE_COUNTRY        + ", "
-                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
-                           +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+                +  "FROM "     + TABLE_COUNTRY        + ", "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -990,7 +638,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return countries;
     }
 
-    /* Get/list all countries in South America */
+    /* Get/list all countries in South America
     public List<DBCountry> getAllCountriesSouthAmerica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -1004,7 +652,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -1021,4 +669,4 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     }
 
 }
-
+*/
