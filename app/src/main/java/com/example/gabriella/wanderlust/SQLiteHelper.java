@@ -360,9 +360,9 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     public void deleteUserTravel(long travelID, long userID) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER_TRAVEL,
-                  KEY_TRAVEL_ID + " = ? AND " +
-                  KEY_USER_ID + " = ?",
-                  new String[]{String.valueOf(travelID), String.valueOf(userID)});
+                KEY_TRAVEL_ID + " = ? AND " +
+                        KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(travelID), String.valueOf(userID)});
         db.close();
     }
 
@@ -375,22 +375,89 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
 
     /* Update travel information */
-    public void updateTravel(DBUser user) {
+    public void updateTravel(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_USERNAME, user.getUsername());
-        values.put(KEY_USER_PASSWORD, user.getPassword());
-        values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
+        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
+        values.put(KEY_TRAVEL_YEAR,      travel.getYear());
+        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
+        values.put(KEY_TRAVEL_DAY,       travel.getDay());
+        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaper());
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getUserID())});
+                new String[]{String.valueOf(travel.getTravelID())});
 
         db.close();
 
     }
 
+    /* Updating table user_travel */
+    public void updateUserTravel(DBUser user, DBTravel travel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_ID,     user.getUserID());
+        values.put(KEY_TRAVEL_ID, travel.getTravelID());
+
+
+        db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(travel.getTravelID())});
+
+        db.update(TABLE_USER_TRAVEL, values,
+                KEY_USER_ID + " = ? AND " + KEY_TRAVEL_ID + " = ?",
+                new String[]{String.valueOf(user.getUserID()), String.valueOf(travel.getTravelID())});
+
+        db.close();
+    }
+
+    /* Updating table travel_country */
+    public void updateTravelCountry(DBCountry country, DBTravel travel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_COUNTRY_NAME, country.getCountry());
+        values.put(KEY_TRAVEL_ID, travel.getTravelID());
+
+        db.update(TABLE_TRAVEL_COUNTRY, values,
+                  KEY_COUNTRY_NAME + " = ? AND " + KEY_TRAVEL_ID + " = ?",
+                  new String[]{String.valueOf(country.getCountry()), String.valueOf(travel.getTravelID())});
+
+        db.close();
+    }
+
+    /* List all the user's travels
+    public DBTravel getTravels(DBUser user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_TRAVEL + " "
+                + "WHERE " + KEY_USER_USERNAME + " = '" + username + "'";
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+
+        DBUser u = new DBUser();
+        u.setUserID(c.getInt(c.getColumnIndex(KEY_USER_ID)));
+        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
+        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
+        u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
+        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
+
+        c.close();
+        db.close();
+
+        return u;
+
+    }
+
+    */
+
+    /* Get a travel */
 
 
 
