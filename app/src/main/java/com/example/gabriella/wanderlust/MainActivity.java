@@ -47,14 +47,23 @@ public class MainActivity extends AppCompatActivity {
         passwordET  = (EditText)findViewById(R.id.passwordID);
 
         loginButton.setOnClickListener(
+
+
                 new View.OnClickListener() {
                     public void onClick(View view) {
+                         /* Set values in table country */
+                        db.setCountries();
+
+                        /* Add one example user */
+                        DBUser exUser = new DBUser("gu@mail.com",  "wanderlust", "Gabriella", "Thoren");
+                        db.createUser(exUser);
+
                         String username = usernameET.getText().toString();
                         String password = passwordET.getText().toString();
 
                         /* Control if user exists */
                         if (db.ifUserExists(username, password)) {
-
+                            setContentView(R.layout.activity_start);
                         }
                         else {
 
