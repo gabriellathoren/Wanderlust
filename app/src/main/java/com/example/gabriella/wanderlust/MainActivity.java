@@ -1,20 +1,28 @@
 package com.example.gabriella.wanderlust;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
+import com.example.gabriella.wanderlust.SQLiteHelper;
+import com.example.gabriella.wanderlust.DBCountry;
+import com.example.gabriella.wanderlust.DBTravel;
+import com.example.gabriella.wanderlust.DBUser;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.view.Window;
 import android.content.Intent;
-import java.util.EventListener;
+import android.widget.Button;
+import android.widget.EditText;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    /* Database Helper */
+    SQLiteHelper db;
+
+    /* Buttons and other objects in layout */
+    Button loginButton;
+    EditText usernameET;
+    EditText passwordET;
 
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
@@ -31,6 +39,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        db = new SQLiteHelper(getApplicationContext());
+
+        loginButton = (Button)findViewById(R.id.login_button);
+        usernameET  = (EditText)findViewById(R.id.usernameID);
+        passwordET  = (EditText)findViewById(R.id.passwordID);
+
+        loginButton.setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View view) {
+                        String username = usernameET.getText().toString();
+                        String password = passwordET.getText().toString();
+
+                        /* Control if user exists */
+                        if (db.ifUserExists(username, password)) {
+
+                        }
+                        else {
+
+                        }
+                    }
+                }
+        );
+
+        db.close();
     }
 
     /*
@@ -43,12 +76,13 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
-    /* Method for log in and show new activity*/
+    /* Method for log in and show new activity
     public void logIn(View view) {
         Intent intent = new Intent(this, StartPage.class);
         startActivity(intent);
         //setContentView(R.layout.activity_start);
     }
+    */
 
     @Override
     protected void onStart() {

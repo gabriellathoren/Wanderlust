@@ -47,7 +47,7 @@ public class DBTravel {
         this.day = day;
     }
 
-    public void setPhoto(int photo) {
+    public void setWallpaper(int photo) {
         this.photo = photo;
     }
 
