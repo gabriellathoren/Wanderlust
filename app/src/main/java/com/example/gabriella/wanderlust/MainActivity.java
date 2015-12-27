@@ -5,6 +5,9 @@ import com.example.gabriella.wanderlust.DBCountry;
 import com.example.gabriella.wanderlust.DBTravel;
 import com.example.gabriella.wanderlust.DBUser;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     Button loginButton;
     EditText usernameET;
     EditText passwordET;
+
+    final Context context = this;
 
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
@@ -49,24 +54,30 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(
 
 
-                new View.OnClickListener() {
-                    public void onClick(View view) {
-                         /* Set values in table country */
-                        db.setCountries();
+            new View.OnClickListener() {
+                public void onClick(View view) {
+                    String username = usernameET.getText().toString();
+                    String password = passwordET.getText().toString();
 
-                        /* Add one example user */
-                        DBUser exUser = new DBUser("gu@mail.com",  "wanderlust", "Gabriella", "Thoren");
-                        db.createUser(exUser);
+                    /* Control if user exists */
+                    if (db.ifUserExists(username, password)) {
+                        setContentView(R.layout.activity_start);
+                    }
+                    else {
+                        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
-                        String username = usernameET.getText().toString();
-                        String password = passwordET.getText().toString();
+                        dlgAlert.setMessage("The password or username is not correct, please try again!");
+                        dlgAlert.setTitle("Wrong input");
+                        dlgAlert.setPositiveButton("Try again", null);
+                        dlgAlert.setCancelable(false);
+                        dlgAlert.create().show();
 
-                        /* Control if user exists */
-                        if (db.ifUserExists(username, password)) {
-                            setContentView(R.layout.activity_start);
-                        }
-                        else {
+                        dlgAlert.setPositiveButton("Try again",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
 
+                                }
+                            });
                         }
                     }
                 }
