@@ -1,17 +1,22 @@
 package com.example.gabriella.wanderlust;
 
+import java.io.Serializable;
+
 /**
  * Created by Gabriella on 2015-12-23.
  *
  * A model class that handles the table user
  */
-public class DBUser {
+public class DBUser implements Serializable {
 
     int userID; /* Behövs den här verkligen? */
     String username;
     String password;
     String first_name;
     String last_name;
+
+    private static final long serialVersionUID = 465497646;
+
 
     /* Constructors */
     public DBUser(){}

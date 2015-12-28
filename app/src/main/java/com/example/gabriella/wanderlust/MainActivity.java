@@ -17,8 +17,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.Serializable;
-
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -30,39 +28,40 @@ public class MainActivity extends AppCompatActivity  {
     EditText usernameET;
     EditText passwordET;
 
+    /* Set context to this */
     final Context context = this;
 
-    /* Current user (needed for further accessing in other classes */
-    private static DBUser user;
+    /* Current user */
+    DBUser user;
 
-
+    /* For logging */
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
-    //För att logga, vilket är bra när man ska ta fram funktionalitet för att vi ska kunna se att
-    //det funkar. Genom denna kan man skriva ut loggutskrifter.
-    //Denna består av en static string eftersom den ska vara gemensam för alla objekt. Den är även
-    //privat så ingen annan behöver känna till den. Den deklareras även som final eftersom man inte
-    //ska kunna röra på den.
-    //Denna sätts till MainActivity eftersom det är min klass som jag befinner mig i och därifrån
-    // hämtas den information som behövs.
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /* Code for not making window resize when user gives text input */
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
+        /* Sets view to the layout activity_main */
         setContentView(R.layout.activity_main);
 
+        /* Initialize database helper */
         db = new SQLiteHelper(getApplicationContext());
 
-        loginButton = (Button)findViewById(R.id.login_button);
+        /* Sets Button and EditTexts to the related buttons and EditTexts in xml-code */
+        loginButton = (Button)  findViewById(R.id.login_button);
         usernameET  = (EditText)findViewById(R.id.usernameID);
         passwordET  = (EditText)findViewById(R.id.passwordID);
 
+        /* OnClickListener for the login-button */
         loginButton.setOnClickListener(
-
 
             new View.OnClickListener() {
                 public void onClick(View view) {
+                    /* Get the user's text input */
                     String username = usernameET.getText().toString();
                     String password = passwordET.getText().toString();
 
@@ -74,14 +73,15 @@ public class MainActivity extends AppCompatActivity  {
                          */
                         user = db.getUser(username);
 
-                        /* If user exist the layout will be set to the start page */
                         Intent intent = new Intent(context, StartPage.class);
-                        //intent.putExtra("user", user);
+                        intent.putExtra("user", user);
+
+                        /* If user exist the layout will be set to the start page */
                         startActivity(intent);
 
                     }
                     else {
-                        // If the user doesn't exist an alertbox will inform the user
+                        /* If the user doesn't exist an alertbox will inform the user */
                         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
                         dlgAlert.setMessage("The password or username is not correct, please try again!");
@@ -95,18 +95,13 @@ public class MainActivity extends AppCompatActivity  {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                 }
-                            });
-                        }
+                        });
                     }
                 }
+            }
         );
 
         db.close();
-    }
-
-    /* Returns the current user. Method for other classes to use */
-    public static DBUser getCurrentUser() {
-        return user;
     }
 
     @Override

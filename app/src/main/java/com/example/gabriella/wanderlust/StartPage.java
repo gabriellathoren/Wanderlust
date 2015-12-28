@@ -46,30 +46,35 @@ import java.util.List;
 
 public class StartPage extends AppCompatActivity {
 
+    /* Layout components */
     private List<DBTravel> travels;
     private RecyclerView rv;
     private RVAdapter ra;
+
+    /* Current user */
     DBUser user;
 
     /* Database Helper */
     SQLiteHelper db;
 
+    /* For logging */
     private final static String LOG_TAG = StartPage.class.getSimpleName();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "StartPage");
 
+        /* Get parameters which where passed through MainActitivy to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
 
-
-        super.onCreate(savedInstanceState);
-        Log.d(LOG_TAG, "");
+        Log.d(LOG_TAG, "User: userID: " + user.getUserID() + " username: " + user.getUsername() + " password:" + user.getPassword());
 
         /* Set view to activity_start */
         setContentView(R.layout.activity_start);
 
-        /* Create RecyclerView for listing travels */
+        /* Create RecyclerView for listing the user's travels */
         rv = (RecyclerView)findViewById(R.id.rv);
         rv.setHasFixedSize(true);
 
@@ -78,7 +83,15 @@ public class StartPage extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-        travels = db.getTravels(user);
+        String username = user.getUsername();
+        String password = user.getPassword();
+
+
+        if(db.ifUserExists(username, password)) {
+            Log.d(LOG_TAG, "User exists in StartPage as well");
+        }
+
+        //travels = db.getTravels(user);
         //createList(3); /* Create list with the amount of objects the user has */
         ra = new RVAdapter(travels);
         rv.setAdapter(ra);

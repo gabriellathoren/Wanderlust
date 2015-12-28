@@ -177,10 +177,10 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_USERNAME,   user.getUsername());
-        values.put(KEY_USER_PASSWORD,   user.getPassword());
+        values.put(KEY_USER_USERNAME, user.getUsername());
+        values.put(KEY_USER_PASSWORD, user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME,  user.getLastName());
+        values.put(KEY_USER_LAST_NAME, user.getLastName());
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(user.getUserID())});
@@ -234,11 +234,11 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         }
 
         DBUser u = new DBUser();
-        u.setUserID(c.getInt(c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
-        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
+        u.setUserID   (c.getInt   (c.getColumnIndex(KEY_USER_ID)));
+        u.setUsername (c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
+        u.setPassword (c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
         u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
-        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
+        u.setLastName (c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
 
         c.close();
         db.close();
@@ -361,8 +361,8 @@ public class SQLiteHelper extends SQLiteOpenHelper{
     public void deleteUserTravel(long travelID, long userID) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER_TRAVEL,
-                  KEY_TRAVEL_ID + " = ? AND " + KEY_USER_ID + " = ?",
-                  new String[]{String.valueOf(travelID), String.valueOf(userID)});
+                KEY_TRAVEL_ID + " = ? AND " + KEY_USER_ID + " = ?",
+                new String[]{String.valueOf(travelID), String.valueOf(userID)});
         db.close();
     }
 
@@ -428,11 +428,12 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
     /* List all the user's travels */
     public List<DBTravel> getTravels(DBUser user) {
+        Log.d(LOG, "SQLiteHelper.getTravels()");
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBTravel> travels = new ArrayList<>();
 
         String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + ","
-                           +  TABLE_TRAVEL_COUNTRY + "," + TABLE_TRAVEL_COUNTRY  + "," +  TABLE_USER_TRAVEL    + " "
+                           +  TABLE_TRAVEL_COUNTRY     + "," + TABLE_TRAVEL_COUNTRY  + "," +  TABLE_USER_TRAVEL    + " "
                            +  "WHERE " + TABLE_USER    + "." + KEY_USER_ID      + " = " + TABLE_USER_TRAVEL    + "." + KEY_USER_ID      + " "
                            +  "AND "   + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID    + " = " + TABLE_USER_TRAVEL    + "." + KEY_TRAVEL_ID    + " "
                            +  "AND "   + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME + " = " + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + " "
@@ -441,24 +442,25 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
         Log.e(LOG, selectQuery);
 
+
         Cursor c = db.rawQuery(selectQuery, null);
 
         /* Looping through all rows and adding to list */
         if (c.moveToFirst()) {
             do {
                 DBTravel t = new DBTravel();
-                t.setTravelID(c.getInt(c.getColumnIndex(KEY_TRAVEL_ID)));
-                t.setYear(c.getInt(c.getColumnIndex(KEY_TRAVEL_YEAR)));
-                t.setMonth(c.getInt(c.getColumnIndex(KEY_TRAVEL_MONTH)));
-                t.setDay(c.getInt(c.getColumnIndex(KEY_TRAVEL_DAY)));
-                t.setWallpaper(c.getInt(c.getColumnIndex(KEY_TRAVEL_WALLPAPER)));
+                t.setTravelID (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
+                t.setYear     (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
+                t.setMonth    (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
+                t.setDay      (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
+                t.setWallpaper(c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER)));
                 travels.add(t);
             }
             while (c.moveToNext());
         }
 
-        c.close();
-        db.close();
+        //c.close();
+        //db.close();
         return travels;
 
     }
