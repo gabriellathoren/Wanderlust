@@ -432,8 +432,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         List<DBTravel> travels = new ArrayList<>();
 
         String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + ","
-                           +  TABLE_TRAVEL_COUNTRY + "," + TABLE_TRAVEL_COUNTRY  + ","
-                           +  TABLE_USER_TRAVEL    + " "
+                           +  TABLE_TRAVEL_COUNTRY + "," + TABLE_TRAVEL_COUNTRY  + "," +  TABLE_USER_TRAVEL    + " "
                            +  "WHERE " + TABLE_USER    + "." + KEY_USER_ID      + " = " + TABLE_USER_TRAVEL    + "." + KEY_USER_ID      + " "
                            +  "AND "   + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID    + " = " + TABLE_USER_TRAVEL    + "." + KEY_TRAVEL_ID    + " "
                            +  "AND "   + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME + " = " + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + " "
@@ -493,10 +492,6 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         return t;
     }
 
-
-
-
-
     /* METHODS FOR ACCESSING THE TABLE COUNTRY */
 
     /* Get the involved countries in the travel */
@@ -505,12 +500,10 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT " + KEY_COUNTRY_NAME     + " "
-                +  "FROM "   + TABLE_COUNTRY        + ","
-                + TABLE_TRAVEL_COUNTRY + ","
-                + TABLE_TRAVEL        + " "
-                +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
-                +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
-                +  "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
+                           +  "FROM "   + TABLE_COUNTRY        + "," + TABLE_TRAVEL_COUNTRY   + "," + TABLE_TRAVEL   + " "
+                           +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
+                           +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
+                           +  "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
 
         Log.e(LOG, selectQuery);
 
@@ -724,7 +717,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         db.insert(TABLE_COUNTRY, null, values);
         db.close();
 
-        Log.v("MyActivity","createCountry (" + country.getCountry() + "," + country.continent + ")");
+        Log.v("MyActivity","createCountry (" + country.getCountry() + "," + country.getContinent() + ")");
     }
 
 

@@ -36,6 +36,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import java.util.ArrayList;
@@ -45,32 +46,42 @@ import java.util.List;
 
 public class StartPage extends AppCompatActivity {
 
-    private List<Travel> travels;
+    private List<DBTravel> travels;
     private RecyclerView rv;
     private RVAdapter ra;
+    DBUser user;
+
+    /* Database Helper */
+    SQLiteHelper db;
 
     private final static String LOG_TAG = StartPage.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-         super.onCreate(savedInstanceState);
-         Log.d(LOG_TAG, "");
+        user = (DBUser)getIntent().getSerializableExtra("user");
 
-         /* Set view to activity_start */
-         setContentView(R.layout.activity_start);
 
-         /* Create RecyclerView for listing travels */
-         rv = (RecyclerView)findViewById(R.id.rv);
-         rv.setHasFixedSize(true);
+        super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "");
 
-         /* Create LayoutManager and Adapter which RecyclerView require */
-         LinearLayoutManager llm = new LinearLayoutManager(this);
-         llm.setOrientation(LinearLayoutManager.VERTICAL);
-         rv.setLayoutManager(llm);
-         travels = createList(3); /* Create list with the amount of objects the user has */
-         ra = new RVAdapter(travels);
-         rv.setAdapter(ra);
+        /* Set view to activity_start */
+        setContentView(R.layout.activity_start);
+
+        /* Create RecyclerView for listing travels */
+        rv = (RecyclerView)findViewById(R.id.rv);
+        rv.setHasFixedSize(true);
+
+        /* Create LayoutManager and Adapter which RecyclerView require */
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(llm);
+
+        travels = db.getTravels(user);
+        //createList(3); /* Create list with the amount of objects the user has */
+        ra = new RVAdapter(travels);
+        rv.setAdapter(ra);
 
     }
 

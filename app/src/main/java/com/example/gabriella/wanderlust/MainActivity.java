@@ -13,21 +13,27 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.content.Intent;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.Serializable;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity  {
 
     /* Database Helper */
     SQLiteHelper db;
 
     /* Buttons and other objects in layout */
-    Button loginButton;
+    Button   loginButton;
     EditText usernameET;
     EditText passwordET;
 
     final Context context = this;
+
+    /* Current user (needed for further accessing in other classes */
+    private static DBUser user;
 
 
     private final static String LOG_TAG = MainActivity.class.getSimpleName();
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_main);
 
         db = new SQLiteHelper(getApplicationContext());
@@ -61,9 +68,20 @@ public class MainActivity extends AppCompatActivity {
 
                     /* Control if user exists */
                     if (db.ifUserExists(username, password)) {
-                        setContentView(R.layout.activity_start);
+
+                        /* A user object must be created so that the information about
+                         * the user is the same for the whole application.
+                         */
+                        user = db.getUser(username);
+
+                        /* If user exist the layout will be set to the start page */
+                        Intent intent = new Intent(context, StartPage.class);
+                        //intent.putExtra("user", user);
+                        startActivity(intent);
+
                     }
                     else {
+                        // If the user doesn't exist an alertbox will inform the user
                         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
                         dlgAlert.setMessage("The password or username is not correct, please try again!");
@@ -86,23 +104,10 @@ public class MainActivity extends AppCompatActivity {
         db.close();
     }
 
-    /*
-    Button btn1 = (Button) findViewById(R.id.login_button);
-    btn1.setOnClickListener(new View.OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            setContentView(R.layout.activity_start);
-        }
-    });
-
-    /* Method for log in and show new activity
-    public void logIn(View view) {
-        Intent intent = new Intent(this, StartPage.class);
-        startActivity(intent);
-        //setContentView(R.layout.activity_start);
+    /* Returns the current user. Method for other classes to use */
+    public static DBUser getCurrentUser() {
+        return user;
     }
-    */
 
     @Override
     protected void onStart() {

@@ -1,28 +1,30 @@
 package com.example.gabriella.wanderlust;
 
+import java.io.Serializable;
+
 /**
  * Created by Gabriella on 2015-12-23.
  *
  * A model class that handles the table travel
  */
-public class DBTravel {
+public class DBTravel implements Serializable {
 
-    int travelID; /* Behövs den här? */
-    String title;
-    int year;
-    int month;
-    int day;
-    int photo; // Vad ska det vara för datatyp här!?
+    private int travelID; /* Behövs den här? */
+    private String title;
+    private int year;
+    private int month;
+    private int day;
+    private int wallpaper; // Vad ska det vara för datatyp här!?
 
     /* Constructors */
     DBTravel(){}
 
     DBTravel(String title, int year, int month, int day, int photo){
-        this.title = title;
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.photo = photo;
+        this.title     = title;
+        this.year      = year;
+        this.month     = month;
+        this.day       = day;
+        this.wallpaper = photo;
     }
 
 
@@ -48,7 +50,7 @@ public class DBTravel {
     }
 
     public void setWallpaper(int photo) {
-        this.photo = photo;
+        this.wallpaper = photo;
     }
 
 
@@ -74,7 +76,7 @@ public class DBTravel {
     }
 
     public int getWallpaper() {
-        return this.photo;
+        return this.wallpaper;
     }
 
 }

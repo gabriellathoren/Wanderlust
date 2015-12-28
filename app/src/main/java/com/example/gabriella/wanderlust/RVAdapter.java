@@ -8,7 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Gabriella on 2015-12-19.
@@ -19,10 +24,10 @@ import java.util.List;
  */
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> {
 
-    private List<Travel> travels;
+    private List<DBTravel> travels;
 
     /* Constructor to the custom adapter that handle the data that the RecyclerView displays */
-    public RVAdapter(List<Travel> travels){
+    public RVAdapter(List<DBTravel> travels){
         this.travels = travels;
     }
 
@@ -37,10 +42,28 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
      */
     @Override
     public void onBindViewHolder(TravelViewHolder travelViewHolder, int i) {
-        Travel t = travels.get(i);
-        travelViewHolder.title.setText(t.title);
-        travelViewHolder.days.setText(t.days);
-        travelViewHolder.background.setImageResource(t.background);
+        DBTravel t = travels.get(i);
+        travelViewHolder.title.setText(t.getTitle());
+
+        /* Today's date */
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String travelDate = t.getYear() + "-" + t.getMonth() + "-" + t.getDay();
+
+        Date date = new Date();
+        String today = dateFormat.format(date);
+
+        try {
+            Date date1 = dateFormat.parse(today);
+            Date date2 = dateFormat.parse(travelDate);
+            long diff  = date1.getTime() - date2.getTime();
+            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+
+            travelViewHolder.days.setText(String.valueOf(days));
+            travelViewHolder.background.setImageResource(t.getWallpaper());
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     /* This method is called when the custom ViewHolder needs to be initialized. Each item of the

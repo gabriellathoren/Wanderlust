@@ -8,8 +8,8 @@ package com.example.gabriella.wanderlust;
  */
 public class DBCountry {
 
-    String country;
-    String continent;
+    private String country;
+    private String continent;
 
 
     /* Constructors */
