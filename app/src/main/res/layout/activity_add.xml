@@ -15,6 +15,7 @@
         layout="@layout/tool_bar">
     </include>
 
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="250dp"
@@ -50,16 +51,16 @@
                 android:layout_marginRight="16dp"
                 android:layout_alignBottom="@+id/backgroundSetter"
                 android:layout_alignParentEnd="true"
-                android:onClick="addWallpaperHandler"/>
+                android:onClick="wallpaperHandler"/>
 
         </android.support.design.widget.CoordinatorLayout>
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Title"
-            android:id="@+id/textView2"
+            android:text="@string/title_header"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:paddingLeft="10dp"
@@ -75,31 +76,31 @@
         android:layout_below="@+id/relativeLayout">
 
         <EditText
+            android:id="@+id/travel_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editText2"
-            android:layout_below="@+id/textView2"
+            android:layout_below="@+id/title"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:padding="10dp"/>
 
         <TextView
+            android:id="@+id/travel_date_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Travel date"
-            android:id="@+id/textView3"
-            android:layout_below="@+id/editText2"
+            android:text="@string/travel_date_header"
+            android:layout_below="@+id/travel_title"
             android:layout_alignParentStart="true"
             android:padding="10dp"/>
 
         <DatePicker
+            android:id="@+id/travel_date_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/datePicker"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/textView3"
+            android:layout_below="@+id/travel_date_header"
             android:layout_alignParentEnd="true"
             android:datePickerMode="spinner"
             android:calendarViewShown="false" />

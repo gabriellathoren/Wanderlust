@@ -4,44 +4,19 @@
 
 package com.example.gabriella.wanderlust;
 
-import android.app.ActionBar;
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.app.ListActivity;
-import android.widget.ArrayAdapter;
-import android.app.Activity;
 import android.view.Menu;
-import android.widget.ListView;
-import android.widget.AdapterView;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 
 import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.List;
 
 
@@ -93,6 +68,7 @@ public class StartPage extends AppCompatActivity {
     /* Sets view to AddActivity when user presses the Floating Action Button for adding travels */
     public void addHandler(View v) {
         Intent intent = new Intent(this, AddActivity.class);
+        intent.putExtra("user", user);
         startActivity(intent);
     }
 

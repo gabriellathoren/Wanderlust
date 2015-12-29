@@ -18,4 +18,8 @@
 
     <!-- Strings for StartPage -->
     <string name="action_settings">Settings</string>
+
+    <!-- Strings for AddActivity -->
+    <string name="title_header">Title</string>
+    <string name="travel_date_header">Travel date</string>
 </resources>
