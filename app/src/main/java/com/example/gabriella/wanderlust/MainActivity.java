@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity  {
             }
         );
 
+        /* Close database */
         db.close();
     }
 

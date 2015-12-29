@@ -13,11 +13,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class SQLiteHelper extends SQLiteOpenHelper{
+public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* Logcat tag */
     private static final String LOG = SQLiteHelper.class.getName();
@@ -61,18 +62,18 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 
 
     /* Table create statements */
-    private static final String CREATE_TABLE_USER = "create table " + TABLE_USER + "("
+    private static final String CREATE_TABLE_USER = "create table if not exists" + TABLE_USER + "("
             + KEY_USER_ID         + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_USER_USERNAME   + " TEXT NOT NULL UNIQUE, "
             + KEY_USER_PASSWORD   + " TEXT NOT NULL, "
             + KEY_USER_FIRST_NAME + " TEXT, "
             + KEY_USER_LAST_NAME  + " TEXT)";
 
-    private static final String CREATE_TABLE_COUNTRY = "create table " + TABLE_COUNTRY + "("
+    private static final String CREATE_TABLE_COUNTRY = "create table  if not exists " + TABLE_COUNTRY + "("
             + KEY_COUNTRY_NAME      + " TEXT PRIMARY KEY, "
             + KEY_COUNTRY_CONTINENT + " TEXT)";
 
-    private static final String CREATE_TABLE_TRAVEL = "create table " + TABLE_TRAVEL + "("
+    private static final String CREATE_TABLE_TRAVEL = "create table  if not exists " + TABLE_TRAVEL + "("
             + KEY_TRAVEL_ID        + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_TRAVEL_TITLE     + " TEXT, "
             + KEY_TRAVEL_YEAR      + " INTEGER NOT NULL, "
@@ -80,21 +81,21 @@ public class SQLiteHelper extends SQLiteOpenHelper{
             + KEY_TRAVEL_DAY       + " INTEGER NOT NULL, "
             + KEY_TRAVEL_WALLPAPER + " INTEGER)";
 
-    private static final String CREATE_TABLE_USER_TRAVEL = "create table " + TABLE_USER_TRAVEL + "("
+    private static final String CREATE_TABLE_USER_TRAVEL = "create table  if not exists " + TABLE_USER_TRAVEL + "("
             + KEY_USER_ID   + " INTEGER UNIQUE, "
             + KEY_TRAVEL_ID + " INTEGER UNIQUE, "
             + "PRIMARY KEY (" + KEY_USER_ID   + "," + KEY_TRAVEL_ID + ") "
             + "FOREIGN KEY (" + KEY_USER_ID   + ") REFERENCES " + TABLE_USER + "(" + KEY_USER_ID + "), "
             + "FOREIGN KEY (" + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
 
-    private static final String CREATE_TABLE_TRAVEL_COUNTRY = "create table " + TABLE_TRAVEL_COUNTRY + "("
+    private static final String CREATE_TABLE_TRAVEL_COUNTRY = "create table  if not exists " + TABLE_TRAVEL_COUNTRY + "("
             + KEY_COUNTRY_NAME + " TEXT UNIQUE, "
             + KEY_TRAVEL_ID    + " INTEGER UNIQUE, "
             + "PRIMARY KEY ("  + KEY_COUNTRY_NAME + "," + KEY_TRAVEL_ID + ") "
             + "FOREIGN KEY ("  + KEY_COUNTRY_NAME + ") REFERENCES " + TABLE_COUNTRY + "(" + KEY_COUNTRY_NAME + "), "
             + "FOREIGN KEY ("  + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
 
-    private static final String CREATE_TABLE_BUCKET_LIST = "create table " + TABLE_BUCKET_LIST + "("
+    private static final String CREATE_TABLE_BUCKET_LIST = "create table  if not exists " + TABLE_BUCKET_LIST + "("
             + KEY_LIST_ID   + " INTEGER PRIMARY KEY, "
             + KEY_TRAVEL_ID + " INTEGER, "
             + KEY_ITEM      + " TEXT, "
@@ -432,8 +433,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBTravel> travels = new ArrayList<>();
 
-        String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + ","
-                           +  TABLE_TRAVEL_COUNTRY     + "," + TABLE_TRAVEL_COUNTRY  + "," +  TABLE_USER_TRAVEL    + " "
+        String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + ","  + TABLE_COUNTRY        + "," + TABLE_TRAVEL_COUNTRY  + "," +  TABLE_USER_TRAVEL + " "
                            +  "WHERE " + TABLE_USER    + "." + KEY_USER_ID      + " = " + TABLE_USER_TRAVEL    + "." + KEY_USER_ID      + " "
                            +  "AND "   + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID    + " = " + TABLE_USER_TRAVEL    + "." + KEY_TRAVEL_ID    + " "
                            +  "AND "   + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME + " = " + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + " "

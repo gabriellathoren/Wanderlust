@@ -10,6 +10,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +56,7 @@ public class StartPage extends AppCompatActivity {
     DBUser user;
 
     /* Database Helper */
-    SQLiteHelper db;
+    SQLiteHelper db = new SQLiteHelper(this);
 
     /* For logging */
     private final static String LOG_TAG = StartPage.class.getSimpleName();
@@ -83,20 +84,18 @@ public class StartPage extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-        String username = user.getUsername();
-        String password = user.getPassword();
-
-
-        if(db.ifUserExists(username, password)) {
-            Log.d(LOG_TAG, "User exists in StartPage as well");
-        }
-
-        //travels = db.getTravels(user);
-        //createList(3); /* Create list with the amount of objects the user has */
+        travels = db.getTravels(user); /* Create list with the amount of objects the user has */
         ra = new RVAdapter(travels);
         rv.setAdapter(ra);
 
     }
+
+    /* Sets view to AddActivity when user presses the Floating Action Button for adding travels */
+    public void addHandler(View v) {
+        Intent intent = new Intent(this, AddActivity.class);
+        startActivity(intent);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,7 +118,7 @@ public class StartPage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /* Creates list of travels with data */
+    /* Creates list of travels with data
     private List<Travel> createList(int size) {
 
         List<Travel> result = new ArrayList<Travel>();
@@ -132,7 +131,7 @@ public class StartPage extends AppCompatActivity {
             result.add(t);
         }
         return result;
-    }
+    }*/
 
     @Override
     protected void onStart() {
