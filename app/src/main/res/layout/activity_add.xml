@@ -17,7 +17,7 @@
 
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/tool_bar"
@@ -31,12 +31,16 @@
             android:layout_height="fill_parent">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="200dp"
                 android:id="@+id/backgroundSetter"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
                 android:src="@drawable/image"
                 android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_marginRight="0dp"
+                android:layout_marginLeft="0dp"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
@@ -82,7 +86,8 @@
             android:layout_below="@+id/title"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
-            android:padding="10dp"/>
+            android:padding="10dp"
+            android:singleLine="true"/>
 
         <TextView
             android:id="@+id/travel_date_header"

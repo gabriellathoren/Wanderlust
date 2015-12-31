@@ -59,7 +59,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
             long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 
             travelViewHolder.days.setText(String.valueOf(days));
-            travelViewHolder.background.setImageResource(t.getWallpaper());
+            travelViewHolder.background.setImageBitmap(t.getWallpaper());
         }
         catch (ParseException e) {
             e.printStackTrace();

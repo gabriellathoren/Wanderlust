@@ -1,5 +1,10 @@
 package com.example.gabriella.wanderlust;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
 /**
@@ -9,17 +14,17 @@ import java.io.Serializable;
  */
 public class DBTravel implements Serializable {
 
-    private int travelID; /* Behövs den här? */
+    private int travelID;
     private String title;
     private int year;
     private int month;
     private int day;
-    private int wallpaper; // Vad ska det vara för datatyp här!?
+    private Bitmap wallpaper;
 
     /* Constructors */
     DBTravel(){}
 
-    DBTravel(String title, int year, int month, int day, int photo){
+    DBTravel(String title, int year, int month, int day, Bitmap photo){
         this.title     = title;
         this.year      = year;
         this.month     = month;
@@ -49,9 +54,16 @@ public class DBTravel implements Serializable {
         this.day = day;
     }
 
-    public void setWallpaper(int photo) {
-        this.wallpaper = photo;
+    public void setWallpaper(Bitmap wallpaper) {
+        this.wallpaper = wallpaper;
     }
+
+    /* When the image is stored in database */
+    public void setWallpaperFromDatabase(byte[] wallpaper) {
+        byte[] bytes   = Base64.decode(wallpaper, Base64.DEFAULT);
+        this.wallpaper = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
 
 
     /* Getters */
@@ -75,8 +87,17 @@ public class DBTravel implements Serializable {
         return this.day;
     }
 
-    public int getWallpaper() {
+    public Bitmap getWallpaper() {
         return this.wallpaper;
+    }
+
+    /* To store image in database the image must be saved as byte[], therefore the method
+     * getWallpaperAsByte() converts the bitmap-image to byte[] */
+    public byte[] getWallpaperAsByte() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        wallpaper.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+
+        return outputStream.toByteArray();
     }
 
 }

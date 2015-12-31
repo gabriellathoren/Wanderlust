@@ -1,7 +1,11 @@
 package com.example.gabriella.wanderlust;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,6 +37,9 @@ public class AddActivity extends AppCompatActivity {
     /* Database Helper */
     SQLiteHelper db = new SQLiteHelper(this);
 
+    /* Set context to this */
+    final Context context = this;
+
     /* For logging */
     private final static String LOG_TAG = StartPage.class.getSimpleName();
 
@@ -42,11 +49,15 @@ public class AddActivity extends AppCompatActivity {
     DatePicker  datePicker;
     ImageView   wallpaper;
 
+    /* Path to the wallpaper image*/
+    Bitmap wallpaperBM;
+
     private static int RESULT_LOAD_IMAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.d(LOG_TAG, "Add Activity");
 
         /* Set layout to activity_add */
@@ -58,6 +69,16 @@ public class AddActivity extends AppCompatActivity {
         /* Get parameters which where passed through StartPage to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
 
+        /* Set default background, changes if the user changes picture */
+        wallpaperBM = BitmapFactory.decodeResource(this.getResources(), R.drawable.wallpaper);
+
+        /* Initialize datePicker with the related xml-component and set minimum date to today's date */
+        datePicker = (DatePicker) findViewById(R.id.travel_date_picker);
+        datePicker.setMinDate(new Date().getTime());
+
+        /* Initialize EditText with the related xml-component */
+        travelTitle = (EditText) findViewById(R.id.travel_title);
+
         /* Change the settings button in toolbar to an OK-button which the user clicks on when
          * done with their input for adding travel
          */
@@ -68,22 +89,50 @@ public class AddActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     public void onClick(View view) {
 
-                        /* Get the user's text input */
-                        String title = travelTitle.getText().toString();
+                        /* Check if title is empty and alert user */
+                        if (travelTitle.getText().toString().matches("")) {
+                            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
-                        datePicker = (DatePicker) findViewById(R.id.travel_date_picker);
-                        String  travelDate = "" + datePicker.getYear() + "-" + datePicker.getMonth() + "-" + datePicker.getDayOfMonth();
+                            dlgAlert.setMessage("You did not write a title for this travel");
+                            dlgAlert.setTitle("Wrong input");
+                            dlgAlert.setPositiveButton("Try again", null);
+                            dlgAlert.setCancelable(false);
+                            dlgAlert.create().show();
 
+                            dlgAlert.setPositiveButton("Try again",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                        }
+                                    });
+                        }
+                        else {
+                            /* Get the user's text input */
+                            String title = travelTitle.getText().toString();
+                            int year     = datePicker.getYear();
+                            int month    = datePicker.getMonth();
+                            int day      = datePicker.getDayOfMonth();
+
+                            /* Initialize travel */
+                            travel = new DBTravel(title, year, month, day, wallpaperBM);
+
+                            /* Insert the values in database */
+                            db.createTravel(travel, user);
+
+                        }
                     }
                 }
         );
     }
 
 
-    /* OnClickHanlder for the floating action button in activity_add so that the user can choose
+    /* OnClickHandler for the floating action button in activity_add so that the user can choose
      * a wallpaper for the travel, otherwice there will be an standard picture.
      */
     public void wallpaperHandler(View view) {
+
+        /* Initialize the ImageView with the related xml-component */
+        wallpaper = (ImageView) findViewById(R.id.backgroundSetter);
 
         /* Triggers an intent for Image Gallery which the user can pick a picture */
         Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -118,7 +167,7 @@ public class AddActivity extends AppCompatActivity {
 
             /* Set imageview to the new image */
             wallpaper.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-
+            wallpaperBM = BitmapFactory.decodeFile(picturePath);
         }
     }
 

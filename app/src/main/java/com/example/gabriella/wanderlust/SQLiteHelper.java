@@ -1,8 +1,6 @@
 package com.example.gabriella.wanderlust;
 
 /**
- * Created by Gabriella on 2015-12-23.
- *
  * This class handles the database
  */
 
@@ -13,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +21,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String LOG = SQLiteHelper.class.getName();
 
     /* Database version */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 4;
 
     /* Database name */
     private static final String DATABASE_NAME = "database";
@@ -35,7 +32,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String TABLE_TRAVEL         = "travel";
     private static final String TABLE_USER_TRAVEL    = "user_travel";
     private static final String TABLE_TRAVEL_COUNTRY = "travel_country";
-    private static final String TABLE_BUCKET_LIST    = "bucket_list";
 
     /* User table - column names */
     private static final String KEY_USER_ID         = "user_ID";
@@ -56,51 +52,35 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_TRAVEL_DAY       = "day";
     private static final String KEY_TRAVEL_WALLPAPER = "wallpaper";
 
-    /* Bucket_List table - column names */
-    private static final String KEY_LIST_ID = "list_ID";
-    private static final String KEY_ITEM = "item";
-
 
     /* Table create statements */
-    private static final String CREATE_TABLE_USER = "create table if not exists" + TABLE_USER + "("
+    private static final String CREATE_TABLE_USER = "create table if not exists " + TABLE_USER + "("
             + KEY_USER_ID         + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_USER_USERNAME   + " TEXT NOT NULL UNIQUE, "
             + KEY_USER_PASSWORD   + " TEXT NOT NULL, "
             + KEY_USER_FIRST_NAME + " TEXT, "
             + KEY_USER_LAST_NAME  + " TEXT)";
 
-    private static final String CREATE_TABLE_COUNTRY = "create table  if not exists " + TABLE_COUNTRY + "("
+    private static final String CREATE_TABLE_COUNTRY = "create table if not exists " + TABLE_COUNTRY + "("
             + KEY_COUNTRY_NAME      + " TEXT PRIMARY KEY, "
             + KEY_COUNTRY_CONTINENT + " TEXT)";
 
-    private static final String CREATE_TABLE_TRAVEL = "create table  if not exists " + TABLE_TRAVEL + "("
+    private static final String CREATE_TABLE_TRAVEL = "create table if not exists " + TABLE_TRAVEL + "("
             + KEY_TRAVEL_ID        + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_TRAVEL_TITLE     + " TEXT, "
             + KEY_TRAVEL_YEAR      + " INTEGER NOT NULL, "
             + KEY_TRAVEL_MONTH     + " INTEGER NOT NULL, "
             + KEY_TRAVEL_DAY       + " INTEGER NOT NULL, "
-            + KEY_TRAVEL_WALLPAPER + " INTEGER)";
-
-    private static final String CREATE_TABLE_USER_TRAVEL = "create table  if not exists " + TABLE_USER_TRAVEL + "("
-            + KEY_USER_ID   + " INTEGER UNIQUE, "
-            + KEY_TRAVEL_ID + " INTEGER UNIQUE, "
-            + "PRIMARY KEY (" + KEY_USER_ID   + "," + KEY_TRAVEL_ID + ") "
-            + "FOREIGN KEY (" + KEY_USER_ID   + ") REFERENCES " + TABLE_USER + "(" + KEY_USER_ID + "), "
-            + "FOREIGN KEY (" + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
+            + KEY_TRAVEL_WALLPAPER + " BLOB, "
+            + KEY_USER_ID          + " INTEGER NOT NULL, "
+            + "FOREIGN KEY (" + KEY_USER_ID + ") REFERENCES " + TABLE_USER + "(" + KEY_USER_ID + "))";
 
     private static final String CREATE_TABLE_TRAVEL_COUNTRY = "create table  if not exists " + TABLE_TRAVEL_COUNTRY + "("
             + KEY_COUNTRY_NAME + " TEXT UNIQUE, "
             + KEY_TRAVEL_ID    + " INTEGER UNIQUE, "
             + "PRIMARY KEY ("  + KEY_COUNTRY_NAME + "," + KEY_TRAVEL_ID + ") "
             + "FOREIGN KEY ("  + KEY_COUNTRY_NAME + ") REFERENCES " + TABLE_COUNTRY + "(" + KEY_COUNTRY_NAME + "), "
-            + "FOREIGN KEY ("  + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
-
-    private static final String CREATE_TABLE_BUCKET_LIST = "create table  if not exists " + TABLE_BUCKET_LIST + "("
-            + KEY_LIST_ID   + " INTEGER PRIMARY KEY, "
-            + KEY_TRAVEL_ID + " INTEGER, "
-            + KEY_ITEM      + " TEXT, "
-            + "FOREIGN KEY (" + KEY_TRAVEL_ID + ") REFERENCES " + TABLE_TRAVEL + "(" + KEY_TRAVEL_ID + "))";
-
+            + "FOREIGN KEY ("  + KEY_TRAVEL_ID    + ") REFERENCES " + TABLE_TRAVEL  + "(" + KEY_TRAVEL_ID    + "))";
 
 
     /* Constructor */
@@ -116,27 +96,23 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_COUNTRY);
         db.execSQL(CREATE_TABLE_TRAVEL);
-        db.execSQL(CREATE_TABLE_USER_TRAVEL);
         db.execSQL(CREATE_TABLE_TRAVEL_COUNTRY);
-        db.execSQL(CREATE_TABLE_BUCKET_LIST);
 
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         /* Drop older tables while upgrading */
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_COUNTRY);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_TRAVEL);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_USER_TRAVEL);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_TRAVEL_COUNTRY);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_BUCKET_LIST);
+        db.execSQL(CREATE_TABLE_USER);
+        db.execSQL(CREATE_TABLE_COUNTRY);
+        db.execSQL(CREATE_TABLE_TRAVEL);
+        db.execSQL(CREATE_TABLE_TRAVEL_COUNTRY);
 
         /* Create new tables */
         onCreate(db);
-        db.close();
-
     }
+
+
 
 
 
@@ -147,22 +123,16 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public void createUser(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        /* Set userID
-        Cursor c = db.rawQuery("SELECT count(*) FROM " + TABLE_USER, null);
-        c.moveToFirst();
-        int count = (c.getInt(0) + 1);*/
-
         ContentValues values = new ContentValues();
         values.put(KEY_USER_ID,         user.getUserID());
         values.put(KEY_USER_USERNAME,   user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME,  user.getLastName());
+        values.put(KEY_USER_LAST_NAME, user.getLastName());
 
         /* Insert row */
         db.insert(TABLE_USER, null, values);
         db.close();
-        //c.close();
     }
 
     /* Delete a user */
@@ -224,7 +194,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT * FROM " + TABLE_USER + " "
-                           + "WHERE " + KEY_USER_USERNAME + " = '" + username + "'";
+                + "WHERE " + KEY_USER_USERNAME + " = '" + username + "'";
 
         Log.e(LOG, selectQuery);
 
@@ -278,101 +248,31 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     /* METHODS FOR ACCESSING THE TABLE TRAVEL */
 
     /* Create a travel */
-    public void createTravel(DBTravel travel, DBUser user, List<DBCountry> countries) {
+    public void createTravel(DBTravel travel, DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String selectQuery = "SELECT count(*) FROM " + TABLE_TRAVEL + ", " + TABLE_USER_TRAVEL  + " "
-                           + "WHERE " + TABLE_TRAVEL      + "." + KEY_TRAVEL_ID + " = " + TABLE_USER_TRAVEL + "." + KEY_TRAVEL_ID + " "
-                           + "AND "   + TABLE_USER_TRAVEL + "." + KEY_USER_ID   + " = " + user.getUserID();
-
-        /* Set travelID
-        Cursor c = db.rawQuery(selectQuery, null);
-        c.moveToFirst();
-        int count = (c.getInt(0) + 1); */
-
+        /* Save the data in ContentValues to store it in database */
         ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_ID,        travel.getTravelID());
         values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
         values.put(KEY_TRAVEL_YEAR,      travel.getYear());
         values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
         values.put(KEY_TRAVEL_DAY,       travel.getDay());
-        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaper());
+        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaperAsByte());
+        values.put(KEY_USER_ID,          user.getUserID());
 
         /* Insert row to the table user*/
-        db.insert(TABLE_USER, null, values);
-
-        /* Add row to table user_travel */
-        createUserTravel(user.getUserID(), travel.getTravelID());
-
-        /* Add row to the table travel_country which connects travel to country */
-        for(int i=0; i<countries.size(); i++) {
-            createTravelCountry(countries.get(i).getCountry(), travel.getTravelID());
-        }
-
-        /* Close database and cursor */
-        db.close();
-        //c.close();
-    }
-
-    /* Add row to the table travel_country which connects travel to countries */
-    public void createTravelCountry(String country, long travelID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_COUNTRY_NAME, country);
-        values.put(KEY_TRAVEL_ID, travelID);
-
-        /* Adds row */
-        db.insert(TABLE_TRAVEL_COUNTRY, null, values);
-
-        /* Close database */
-        db.close();
-
-    }
-
-    /* Add row to the table user_travel which connects user to travel */
-    public void createUserTravel(long userID, long travelID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, userID);
-        values.put(KEY_TRAVEL_ID, travelID);
-
-        /* Adds row */
-        db.insert(TABLE_USER_TRAVEL, null, values);
-
-        /* Close database */
+        db.insert(TABLE_TRAVEL, null, values);
         db.close();
     }
+
 
     /* Delete travel */
     public void deleteTravel(long travelID, long userID) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travelID)});
         db.close();
-
-        /* Delete related travel_user */
-        deleteUserTravel(travelID, userID);
-
-        /* Delete related travel_country */
-        deleteTravelCountry(travelID);
     }
 
-    /* Delete user_travel */
-    public void deleteUserTravel(long travelID, long userID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_USER_TRAVEL,
-                KEY_TRAVEL_ID + " = ? AND " + KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(travelID), String.valueOf(userID)});
-        db.close();
-    }
-
-    /* Delete travel_user */
-    public void deleteTravelCountry(long travelID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TRAVEL_COUNTRY, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travelID)});
-        db.close();
-    }
 
 
     /* Update travel information */
@@ -382,49 +282,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_TRAVEL_TITLE, travel.getTitle());
         values.put(KEY_TRAVEL_YEAR,      travel.getYear());
-        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
+        values.put(KEY_TRAVEL_MONTH, travel.getMonth());
         values.put(KEY_TRAVEL_DAY,       travel.getDay());
-        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaper());
+        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaperAsByte());
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
                 new String[]{String.valueOf(travel.getTravelID())});
 
         db.close();
 
-    }
-
-    /* Updating table user_travel */
-    public void updateUserTravel(DBUser user, DBTravel travel) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID,     user.getUserID());
-        values.put(KEY_TRAVEL_ID, travel.getTravelID());
-
-
-        db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(travel.getTravelID())});
-
-        db.update(TABLE_USER_TRAVEL, values,
-                KEY_USER_ID + " = ? AND " + KEY_TRAVEL_ID + " = ?",
-                new String[]{String.valueOf(user.getUserID()), String.valueOf(travel.getTravelID())});
-
-        db.close();
-    }
-
-    /* Updating table travel_country */
-    public void updateTravelCountry(DBCountry country, DBTravel travel) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_COUNTRY_NAME, country.getCountry());
-        values.put(KEY_TRAVEL_ID, travel.getTravelID());
-
-        db.update(TABLE_TRAVEL_COUNTRY, values,
-                KEY_COUNTRY_NAME + " = ? AND " + KEY_TRAVEL_ID + " = ?",
-                new String[]{String.valueOf(country.getCountry()), String.valueOf(travel.getTravelID())});
-
-        db.close();
     }
 
     /* List all the user's travels */
@@ -433,12 +299,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBTravel> travels = new ArrayList<>();
 
-        String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + ","  + TABLE_COUNTRY        + "," + TABLE_TRAVEL_COUNTRY  + "," +  TABLE_USER_TRAVEL + " "
-                           +  "WHERE " + TABLE_USER    + "." + KEY_USER_ID      + " = " + TABLE_USER_TRAVEL    + "." + KEY_USER_ID      + " "
-                           +  "AND "   + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID    + " = " + TABLE_USER_TRAVEL    + "." + KEY_TRAVEL_ID    + " "
-                           +  "AND "   + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME + " = " + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + " "
-                           +  "AND "   + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID    + " = " + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + " "
-                           +  "AND "   + TABLE_USER    + "." + KEY_USER_ID      + " = " + String.valueOf(user.getUserID()));
+        String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
+                           +  "WHERE " + TABLE_TRAVEL  + "." + KEY_USER_ID + " = " + TABLE_USER + "." + KEY_USER_ID + " "
+                           +  "AND "   + TABLE_USER    + "." + KEY_USER_ID + " = " + String.valueOf(user.getUserID()));
 
         Log.e(LOG, selectQuery);
 
@@ -449,11 +312,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBTravel t = new DBTravel();
-                t.setTravelID (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
-                t.setYear     (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
-                t.setMonth    (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
-                t.setDay      (c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
-                t.setWallpaper(c.getInt(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER)));
+                t.setTravelID             (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
+                t.setYear                 (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
+                t.setMonth                (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
+                t.setDay                  (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
+                t.setWallpaperFromDatabase(c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER)));
+
                 travels.add(t);
             }
             while (c.moveToNext());
@@ -465,7 +329,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    /* Get a single travel */
+
+    /* Get a single travel
     public DBTravel getTravel(DBTravel travel) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -493,6 +358,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         return t;
     }
+    */
 
     /* METHODS FOR ACCESSING THE TABLE COUNTRY */
 

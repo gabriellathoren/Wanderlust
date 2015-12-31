@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         /* Code for not making window resize when user gives text input */
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity  {
 
                         /* If user exist the layout will be set to the start page */
                         startActivity(intent);
+                        finish();
 
                     }
                     else {

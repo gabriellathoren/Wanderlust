@@ -59,9 +59,11 @@ public class StartPage extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-        travels = db.getTravels(user); /* Create list with the amount of objects the user has */
+        /*
+        travels = db.getTravels(user);  Create list with the amount of objects the user has
         ra = new RVAdapter(travels);
         rv.setAdapter(ra);
+        */
 
     }
 
