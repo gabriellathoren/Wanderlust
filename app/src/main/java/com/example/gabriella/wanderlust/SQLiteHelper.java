@@ -9,6 +9,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -26,11 +28,16 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     /* Database name */
     private static final String DATABASE_NAME = "database";
 
+    /* int to determine which wallpaper color to use when the user has not chosen one herself/himself */
+    private int wallpaperColor = 1;
+
+    /* Set context, otherwice the getResource() won't work */
+    private Context context;
+
     /* Table names */
     private static final String TABLE_USER           = "user";
     private static final String TABLE_COUNTRY        = "country";
     private static final String TABLE_TRAVEL         = "travel";
-    private static final String TABLE_USER_TRAVEL    = "user_travel";
     private static final String TABLE_TRAVEL_COUNTRY = "travel_country";
 
     /* User table - column names */
@@ -153,8 +160,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
         values.put(KEY_USER_LAST_NAME, user.getLastName());
 
-        db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getUserID())});
+        db.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
 
         db.close();
 
@@ -194,7 +200,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT * FROM " + TABLE_USER + " "
-                + "WHERE " + KEY_USER_USERNAME + " = '" + username + "'";
+                           + "WHERE " + KEY_USER_USERNAME + " = '" + username + "'";
 
         Log.e(LOG, selectQuery);
 
@@ -273,8 +279,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-
-
     /* Update travel information */
     public void updateTravel(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -300,31 +304,61 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         List<DBTravel> travels = new ArrayList<>();
 
         String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
-                           +  "WHERE " + TABLE_TRAVEL  + "." + KEY_USER_ID + " = " + TABLE_USER + "." + KEY_USER_ID + " "
-                           +  "AND "   + TABLE_USER    + "." + KEY_USER_ID + " = " + String.valueOf(user.getUserID()));
+                           +  "WHERE " + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = " + TABLE_USER + "." + KEY_USER_ID + " "
+                           +  "AND "   + TABLE_USER    + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "'");
 
         Log.e(LOG, selectQuery);
 
 
         Cursor c = db.rawQuery(selectQuery, null);
 
+
         /* Looping through all rows and adding to list */
         if (c.moveToFirst()) {
             do {
                 DBTravel t = new DBTravel();
-                t.setTravelID             (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
-                t.setYear                 (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
-                t.setMonth                (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
-                t.setDay                  (c.getInt (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
-                t.setWallpaperFromDatabase(c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER)));
+                t.setTravelID(c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
+                t.setTitle   (c.getString(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_TITLE)));
+                t.setYear    (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
+                t.setMonth   (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
+                t.setDay     (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
+
+                /* Control if the user choose own image as a wallpaper */
+                if (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER) != -1) {
+                    byte[] bytes = c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER));
+                    t.setWallpaperFromDatabase(bytes);
+                }
+                /* If not, the travel gets an default background */
+                else {
+                    switch(wallpaperColor) {
+                        case 1:
+                            Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1);
+                            t.setWallpaper(color);
+                            wallpaperColor++;
+                            break;
+
+                        case 2:
+                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2);
+                            t.setWallpaper(color);
+                            wallpaperColor++;
+                            break;
+
+                        case 3:
+                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3);
+                            t.setWallpaper(color);
+                            wallpaperColor = 1;
+                            break;
+                    }
+
+                }
 
                 travels.add(t);
             }
             while (c.moveToNext());
         }
 
-        //c.close();
-        //db.close();
+        c.close();
+        db.close();
         return travels;
 
     }
@@ -371,7 +405,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                            +  "FROM "   + TABLE_COUNTRY        + "," + TABLE_TRAVEL_COUNTRY   + "," + TABLE_TRAVEL   + " "
                            +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
                            +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
-                           +  "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
+                + "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
 
         Log.e(LOG, selectQuery);
 
@@ -400,7 +434,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
                 +  "FROM "     + TABLE_COUNTRY        + ", "
-                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
+                + "WHERE " + KEY_COUNTRY_CONTINENT + "= 'Africa' "
                 +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
@@ -430,7 +464,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
                 +  "FROM "     + TABLE_COUNTRY        + ", "
-                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
+                + "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
                 +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
@@ -460,7 +494,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
                 +  "FROM "     + TABLE_COUNTRY        + ", "
-                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Europe' "
+                + "WHERE " + KEY_COUNTRY_CONTINENT + "= 'Europe' "
                 +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);
@@ -520,7 +554,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
                 +  "FROM "     + TABLE_COUNTRY        + ", "
-                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
+                + "WHERE " + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
                 +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
 
         Log.e(LOG, selectQuery);

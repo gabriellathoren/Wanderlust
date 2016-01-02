@@ -60,8 +60,7 @@ public class DBTravel implements Serializable {
 
     /* When the image is stored in database */
     public void setWallpaperFromDatabase(byte[] wallpaper) {
-        byte[] bytes   = Base64.decode(wallpaper, Base64.DEFAULT);
-        this.wallpaper = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        this.wallpaper = BitmapFactory.decodeByteArray(wallpaper, 0, wallpaper.length);
     }
 
 

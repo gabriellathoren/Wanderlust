@@ -45,8 +45,6 @@ public class StartPage extends AppCompatActivity {
         /* Get parameters which where passed through MainActitivy to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
 
-        Log.d(LOG_TAG, "User: userID: " + user.getUserID() + " username: " + user.getUsername() + " password:" + user.getPassword());
-
         /* Set view to activity_start */
         setContentView(R.layout.activity_start);
 
@@ -59,11 +57,9 @@ public class StartPage extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-        /*
-        travels = db.getTravels(user);  Create list with the amount of objects the user has
+        travels = db.getTravels(user); /* Create list with the amount of objects the user has */
         ra = new RVAdapter(travels);
         rv.setAdapter(ra);
-        */
 
     }
 
@@ -77,11 +73,9 @@ public class StartPage extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         /* Adds items to the actionbar if it is present */
         getMenuInflater().inflate(R.menu.my, menu);
         return true;
-
     }
 
     @Override
@@ -95,21 +89,6 @@ public class StartPage extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /* Creates list of travels with data
-    private List<Travel> createList(int size) {
-
-        List<Travel> result = new ArrayList<Travel>();
-        for (int i=1; i <= size; i++) {
-            Travel t = new Travel();
-            t.background = R.drawable.wallpaper;
-            t.title = "Paris";
-            t.days = "3";
-
-            result.add(t);
-        }
-        return result;
-    }*/
 
     @Override
     protected void onStart() {

@@ -69,8 +69,8 @@ public class AddActivity extends AppCompatActivity {
         /* Get parameters which where passed through StartPage to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
 
-        /* Set default background, changes if the user changes picture */
-        wallpaperBM = BitmapFactory.decodeResource(this.getResources(), R.drawable.wallpaper);
+        /* Set default background, changes if the user changes picture
+        wallpaperBM = BitmapFactory.decodeResource(this.getResources(), R.drawable.wallpaper);*/
 
         /* Initialize datePicker with the related xml-component and set minimum date to today's date */
         datePicker = (DatePicker) findViewById(R.id.travel_date_picker);
@@ -109,9 +109,9 @@ public class AddActivity extends AppCompatActivity {
                         else {
                             /* Get the user's text input */
                             String title = travelTitle.getText().toString();
-                            int year     = datePicker.getYear();
-                            int month    = datePicker.getMonth();
-                            int day      = datePicker.getDayOfMonth();
+                            int year     = datePicker .getYear();
+                            int month    = datePicker .getMonth();
+                            int day      = datePicker .getDayOfMonth();
 
                             /* Initialize travel */
                             travel = new DBTravel(title, year, month, day, wallpaperBM);
@@ -120,6 +120,11 @@ public class AddActivity extends AppCompatActivity {
                             db.createTravel(travel, user);
 
                         }
+
+                        /* Go back to the StartPage when the new travel has been stored in the database*/
+                        Intent intent = new Intent(context, StartPage.class);
+                        intent.putExtra("user", user);
+                        startActivity(intent);
                     }
                 }
         );

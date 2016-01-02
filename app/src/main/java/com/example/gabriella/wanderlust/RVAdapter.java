@@ -2,6 +2,7 @@ package com.example.gabriella.wanderlust;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Gabriella on 2015-12-19.
- *
- *
- * Adapter that follows the view holder design pattern and reuses the card view layout.
- *
+ *  Adapter that follows the view holder design pattern and reuses the card view layout (item.xml).
  */
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> {
 
@@ -43,20 +40,23 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
     @Override
     public void onBindViewHolder(TravelViewHolder travelViewHolder, int i) {
         DBTravel t = travels.get(i);
+
+        /* Set title */
         travelViewHolder.title.setText(t.getTitle());
 
         /* Today's date */
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String travelDate = t.getYear() + "-" + t.getMonth() + "-" + t.getDay();
-
         Date date = new Date();
         String today = dateFormat.format(date);
+
+        /* Travel date */
+        String travelDate = t.getYear() + "-" + t.getMonth() + "-" + t.getDay();
 
         try {
             Date date1 = dateFormat.parse(today);
             Date date2 = dateFormat.parse(travelDate);
-            long diff  = date1.getTime() - date2.getTime();
-            long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+            long diff  = date2.getTime() - date1.getTime();
+            long days  = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 
             travelViewHolder.days.setText(String.valueOf(days));
             travelViewHolder.background.setImageBitmap(t.getWallpaper());
@@ -72,24 +72,24 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
      */
     @Override
     public TravelViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item,
-                viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item, viewGroup, false);
         return new TravelViewHolder(v);
     }
 
     /* Create the adapter */
     public static class TravelViewHolder extends RecyclerView.ViewHolder {
 
-        protected CardView cv;
-        protected TextView title;
-        protected TextView days;
+        protected CardView  cv;
+        protected TextView  title;
+        protected TextView  days;
         protected ImageView background;
 
         TravelViewHolder(View itemView) {
             super(itemView);
-            cv    = (CardView)itemView.findViewById(R.id.card_view);
-            title = (TextView)itemView.findViewById(R.id.title);
-            days  = (TextView)itemView.findViewById(R.id.days);
+
+            cv         = (CardView)itemView.findViewById(R.id.card_view);
+            title      = (TextView)itemView.findViewById(R.id.title);
+            days       = (TextView)itemView.findViewById(R.id.days);
             background = (ImageView)itemView.findViewById(R.id.background);
         }
     }
