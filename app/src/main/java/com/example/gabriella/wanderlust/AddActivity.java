@@ -69,9 +69,6 @@ public class AddActivity extends AppCompatActivity {
         /* Get parameters which where passed through StartPage to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
 
-        /* Set default background, changes if the user changes picture
-        wallpaperBM = BitmapFactory.decodeResource(this.getResources(), R.drawable.wallpaper);*/
-
         /* Initialize datePicker with the related xml-component and set minimum date to today's date */
         datePicker = (DatePicker) findViewById(R.id.travel_date_picker);
         datePicker.setMinDate(new Date().getTime());
@@ -106,6 +103,22 @@ public class AddActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+                        else if (travelTitle.getText().toString().length() > 17) {
+                            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
+
+                            dlgAlert.setMessage("The title is too long, maximum number of characters is 17");
+                            dlgAlert.setTitle("Wrong input");
+                            dlgAlert.setPositiveButton("Try again", null);
+                            dlgAlert.setCancelable(false);
+                            dlgAlert.create().show();
+
+                            dlgAlert.setPositiveButton("Try again",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                        }
+                                    });
+                        }
                         else {
                             /* Get the user's text input */
                             String title = travelTitle.getText().toString();
@@ -114,17 +127,26 @@ public class AddActivity extends AppCompatActivity {
                             int day      = datePicker .getDayOfMonth();
 
                             /* Initialize travel */
-                            travel = new DBTravel(title, year, month, day, wallpaperBM);
+
+                            if (wallpaperBM == null) {
+                                /* If the user didn't select a image */
+                                travel = new DBTravel(title, year, month, day);
+                            }
+                            else {
+                                /* If the user selected own image as wallpaper */
+                                travel = new DBTravel(title, year, month, day, wallpaperBM);
+                            }
+
 
                             /* Insert the values in database */
                             db.createTravel(travel, user);
 
-                        }
+                            /* Go back to the StartPage when the new travel has been stored in the database*/
+                            Intent intent = new Intent(context, StartPage.class);
+                            intent.putExtra("user", user);
+                            startActivity(intent);
 
-                        /* Go back to the StartPage when the new travel has been stored in the database*/
-                        Intent intent = new Intent(context, StartPage.class);
-                        intent.putExtra("user", user);
-                        startActivity(intent);
+                        }
                     }
                 }
         );

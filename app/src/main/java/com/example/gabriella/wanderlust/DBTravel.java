@@ -31,6 +31,12 @@ public class DBTravel implements Serializable {
         this.day       = day;
         this.wallpaper = photo;
     }
+    DBTravel(String title, int year, int month, int day){
+        this.title     = title;
+        this.year      = year;
+        this.month     = month;
+        this.day       = day;
+    }
 
 
     /* Setters */
@@ -93,6 +99,11 @@ public class DBTravel implements Serializable {
     /* To store image in database the image must be saved as byte[], therefore the method
      * getWallpaperAsByte() converts the bitmap-image to byte[] */
     public byte[] getWallpaperAsByte() {
+
+        if (wallpaper == null) {
+            return null;
+        }
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         wallpaper.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
 

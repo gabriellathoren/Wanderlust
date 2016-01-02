@@ -31,9 +31,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     /* int to determine which wallpaper color to use when the user has not chosen one herself/himself */
     private int wallpaperColor = 1;
 
-    /* Set context, otherwice the getResource() won't work */
-    private Context context;
-
     /* Table names */
     private static final String TABLE_USER           = "user";
     private static final String TABLE_COUNTRY        = "country";
@@ -259,10 +256,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         /* Save the data in ContentValues to store it in database */
         ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
-        values.put(KEY_TRAVEL_YEAR,      travel.getYear());
-        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
-        values.put(KEY_TRAVEL_DAY,       travel.getDay());
+        values.put(KEY_TRAVEL_TITLE, travel.getTitle());
+        values.put(KEY_TRAVEL_YEAR,  travel.getYear());
+        values.put(KEY_TRAVEL_MONTH, travel.getMonth());
+        values.put(KEY_TRAVEL_DAY,   travel.getDay());
         values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaperAsByte());
         values.put(KEY_USER_ID,          user.getUserID());
 
@@ -273,7 +270,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
 
     /* Delete travel */
-    public void deleteTravel(long travelID, long userID) {
+    public void deleteTravel(long travelID) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travelID)});
         db.close();
@@ -298,14 +295,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
     /* List all the user's travels */
-    public List<DBTravel> getTravels(DBUser user) {
+    public List<DBTravel> getTravels(DBUser user, Context context) {
         Log.d(LOG, "SQLiteHelper.getTravels()");
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBTravel> travels = new ArrayList<>();
 
         String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
                            +  "WHERE " + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = " + TABLE_USER + "." + KEY_USER_ID + " "
-                           +  "AND "   + TABLE_USER    + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "'");
+                           +  "AND "   + TABLE_USER    + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "' "
+                           +  "ORDER BY " + TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
 
         Log.e(LOG, selectQuery);
 
@@ -323,35 +321,37 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 t.setMonth   (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
                 t.setDay     (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
 
+
                 /* Control if the user choose own image as a wallpaper */
-                if (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER) != -1) {
-                    byte[] bytes = c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER));
+                byte[] bytes = c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER));
+                if (bytes != null)  {
                     t.setWallpaperFromDatabase(bytes);
                 }
                 /* If not, the travel gets an default background */
                 else {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inScaled = false;
                     switch(wallpaperColor) {
+
                         case 1:
-                            Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1);
+                            Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1, options);
                             t.setWallpaper(color);
                             wallpaperColor++;
                             break;
 
                         case 2:
-                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2);
+                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2, options);
                             t.setWallpaper(color);
                             wallpaperColor++;
                             break;
 
                         case 3:
-                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3);
+                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3, options);
                             t.setWallpaper(color);
                             wallpaperColor = 1;
                             break;
                     }
-
                 }
-
                 travels.add(t);
             }
             while (c.moveToNext());

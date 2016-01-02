@@ -4,6 +4,7 @@
 
 package com.example.gabriella.wanderlust;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +34,9 @@ public class StartPage extends AppCompatActivity {
     /* Database Helper */
     SQLiteHelper db = new SQLiteHelper(this);
 
+    /* Set context to this */
+    final Context context = this;
+
     /* For logging */
     private final static String LOG_TAG = StartPage.class.getSimpleName();
 
@@ -57,8 +61,8 @@ public class StartPage extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rv.setLayoutManager(llm);
 
-        travels = db.getTravels(user); /* Create list with the amount of objects the user has */
-        ra = new RVAdapter(travels);
+        travels = db.getTravels(user, context); /* Create list with the amount of objects the user has */
+        ra = new RVAdapter(travels, context);
         rv.setAdapter(ra);
 
     }
@@ -78,11 +82,9 @@ public class StartPage extends AppCompatActivity {
         return true;
     }
 
+    /* Method is called when an item in the action bar is selected. */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -94,13 +96,9 @@ public class StartPage extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
     }
-
-    /* Method that shows new activity after clicking cardview */
+    /* Method that shows new activity after clicking cardview
     public void travelLayout(View view) {
         Intent intent = new Intent(this, TravelPage.class);
         startActivity(intent);
-        //setContentView(R.layout.activity_start);
-    }
-
-
+    }*/
 }

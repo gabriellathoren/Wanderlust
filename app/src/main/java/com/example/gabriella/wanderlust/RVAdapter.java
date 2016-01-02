@@ -1,17 +1,23 @@
 package com.example.gabriella.wanderlust;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -19,14 +25,9 @@ import java.util.concurrent.TimeUnit;
 /**
  *  Adapter that follows the view holder design pattern and reuses the card view layout (item.xml).
  */
-public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> {
+public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> implements Serializable{
 
     private List<DBTravel> travels;
-
-    /* Constructor to the custom adapter that handle the data that the RecyclerView displays */
-    public RVAdapter(List<DBTravel> travels){
-        this.travels = travels;
-    }
 
     /* Return the number of items present in the data. */
     @Override
@@ -34,36 +35,52 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         return travels.size();
     }
 
+    /* Context, is needed for starting new activity */
+    private final Context context;
+
+
+    /* Constructor to the custom adapter that handle the data that the RecyclerView displays */
+    public RVAdapter(List<DBTravel> travels, Context context){
+        this.travels = travels;
+        this.context = context;
+    }
+
+
     /* Specifies the contents of each item of the RecyclerView. Sets the values of the title, days,
      * and background fields of the CardView.
      */
     @Override
-    public void onBindViewHolder(TravelViewHolder travelViewHolder, int i) {
-        DBTravel t = travels.get(i);
+    public void onBindViewHolder(TravelViewHolder travelViewHolder, int position) {
+        final DBTravel t = travels.get(position);
+        final int    pos = position;
 
         /* Set title */
         travelViewHolder.title.setText(t.getTitle());
 
-        /* Today's date */
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        String today = dateFormat.format(date);
-
         /* Travel date */
-        String travelDate = t.getYear() + "-" + t.getMonth() + "-" + t.getDay();
+        Calendar thatDay = Calendar.getInstance();
+        thatDay.set(Calendar.DAY_OF_MONTH, t.getDay());
+        thatDay.set(Calendar.MONTH,t.getMonth()); // 0-11 so 1 less
+        thatDay.set(Calendar.YEAR, t.getYear());
 
-        try {
-            Date date1 = dateFormat.parse(today);
-            Date date2 = dateFormat.parse(travelDate);
-            long diff  = date2.getTime() - date1.getTime();
-            long days  = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        /* Today's date */
+        Calendar today = Calendar.getInstance();
 
-            travelViewHolder.days.setText(String.valueOf(days));
-            travelViewHolder.background.setImageBitmap(t.getWallpaper());
-        }
-        catch (ParseException e) {
-            e.printStackTrace();
-        }
+        long diff = thatDay.getTimeInMillis() - today.getTimeInMillis();
+        long days = diff / (24 * 60 * 60 * 1000);
+
+        travelViewHolder.days.setText(String.valueOf(days));
+        travelViewHolder.background.setImageBitmap(t.getWallpaper());
+
+        travelViewHolder.background.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, TravelPage.class);
+                intent.putExtra("travel", t);
+                context.startActivity(intent);
+            }
+        });
+
     }
 
     /* This method is called when the custom ViewHolder needs to be initialized. Each item of the
@@ -87,10 +104,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         TravelViewHolder(View itemView) {
             super(itemView);
 
-            cv         = (CardView)itemView.findViewById(R.id.card_view);
-            title      = (TextView)itemView.findViewById(R.id.title);
-            days       = (TextView)itemView.findViewById(R.id.days);
+            cv         = (CardView) itemView.findViewById(R.id.card_view);
+            title      = (TextView) itemView.findViewById(R.id.title);
+            days       = (TextView) itemView.findViewById(R.id.days);
             background = (ImageView)itemView.findViewById(R.id.background);
+            background.setImageAlpha(80);
         }
     }
 
