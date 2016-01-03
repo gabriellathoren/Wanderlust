@@ -38,7 +38,6 @@ public class DBTravel implements Serializable {
         this.day       = day;
     }
 
-
     /* Setters */
     public void setTravelID(int id) {
         this.travelID = id;

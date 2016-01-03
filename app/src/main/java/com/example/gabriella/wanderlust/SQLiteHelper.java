@@ -365,8 +365,67 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
 
     /* Get a single travel
-    public DBTravel getTravel(DBTravel travel) {
+    public DBTravel getTravel(int position, DBUser user) {
         SQLiteDatabase db = this.getReadableDatabase();
+
+        List<DBTravel> travels = new ArrayList<>();
+
+        String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
+                           +  "WHERE "    + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = " + TABLE_USER + "." + KEY_USER_ID + " "
+                           +  "AND "      + TABLE_USER    + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "' "
+                           +  "ORDER BY " + TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
+
+        Log.e(LOG, selectQuery);
+
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+
+        /* Looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                DBTravel t = new DBTravel();
+                t.setTravelID(c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
+                t.setTitle   (c.getString(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_TITLE)));
+                t.setYear    (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
+                t.setMonth   (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
+                t.setDay     (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
+
+
+                /* Control if the user choose own image as a wallpaper
+                byte[] bytes = c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER));
+                if (bytes != null)  {
+                    t.setWallpaperFromDatabase(bytes);
+                }
+                /* If not, the travel gets an default background
+                else {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inScaled = false;
+                    switch(wallpaperColor) {
+
+                        case 1:
+                            Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1, options);
+                            t.setWallpaper(color);
+                            wallpaperColor++;
+                            break;
+
+                        case 2:
+                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2, options);
+                            t.setWallpaper(color);
+                            wallpaperColor++;
+                            break;
+
+                        case 3:
+                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3, options);
+                            t.setWallpaper(color);
+                            wallpaperColor = 1;
+                            break;
+                    }
+                }
+                travels.add(t);
+            }
+            while (c.moveToNext());
+        }
 
         String selectQuery = "SELECT * FROM " + TABLE_TRAVEL + " "
                            + "WHERE " + KEY_TRAVEL_ID + " = " + travel.getTravelID();
@@ -392,7 +451,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         return t;
     }
-    */
+*/
+
 
     /* METHODS FOR ACCESSING THE TABLE COUNTRY */
 

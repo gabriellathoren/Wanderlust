@@ -22,6 +22,10 @@ public class TravelPage extends AppCompatActivity {
     private final static String LOG_TAG = TravelPage.class.getSimpleName();
 
     private DBTravel travel;
+    private int cardViewPosition;
+
+    /* Database Helper */
+    SQLiteHelper db = new SQLiteHelper(this);
 
     /* Components */
     ImageButton imageButton;
@@ -35,7 +39,8 @@ public class TravelPage extends AppCompatActivity {
         Log.d(LOG_TAG, "TravelPage.java");
 
         /* Get parameters which where passed through MainActitivy to get the current user */
-        travel = (DBTravel)getIntent().getSerializableExtra("travel");
+        cardViewPosition = (int)getIntent().getSerializableExtra("travel position");
+        Log.d(LOG_TAG, "travel position: " + cardViewPosition);
 
         /* Reuse the layout for adding new travels */
         setContentView(R.layout.activity_add);
@@ -52,6 +57,9 @@ public class TravelPage extends AppCompatActivity {
          */
         imageButton = (ImageButton)findViewById(R.id.settings);
         imageButton.setBackgroundResource(R.drawable.ic_check_box_white_24dp);
+
+        /* Get current travel
+        db.*/
 
         /* Set DatePicker to travel date */
         int year  = travel.getYear();

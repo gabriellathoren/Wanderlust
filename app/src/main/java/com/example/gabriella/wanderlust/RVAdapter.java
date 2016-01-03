@@ -76,7 +76,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, TravelPage.class);
-                intent.putExtra("travel", t);
+                intent.putExtra("travel position", pos);
                 context.startActivity(intent);
             }
         });
