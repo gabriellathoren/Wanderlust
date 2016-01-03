@@ -69,11 +69,8 @@ public class AddActivity extends AppCompatActivity {
         /* Get parameters which where passed through StartPage to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
 
-        /* Initialize datePicker with the related xml-component and set minimum date to today's date */
+        /* Initialize components with the related xml-components */
         datePicker = (DatePicker) findViewById(R.id.travel_date_picker);
-        datePicker.setMinDate(new Date().getTime());
-
-        /* Initialize EditText with the related xml-component */
         travelTitle = (EditText) findViewById(R.id.travel_title);
 
         /* Change the settings button in toolbar to an OK-button which the user clicks on when
@@ -103,6 +100,7 @@ public class AddActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+                        /* Check if text is longer then 17 characters */
                         else if (travelTitle.getText().toString().length() > 17) {
                             AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
@@ -127,7 +125,6 @@ public class AddActivity extends AppCompatActivity {
                             int day      = datePicker .getDayOfMonth();
 
                             /* Initialize travel */
-
                             if (wallpaperBM == null) {
                                 /* If the user didn't select a image */
                                 travel = new DBTravel(title, year, month, day);
@@ -136,7 +133,6 @@ public class AddActivity extends AppCompatActivity {
                                 /* If the user selected own image as wallpaper */
                                 travel = new DBTravel(title, year, month, day, wallpaperBM);
                             }
-
 
                             /* Insert the values in database */
                             db.createTravel(travel, user);

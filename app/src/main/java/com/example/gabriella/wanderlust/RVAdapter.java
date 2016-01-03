@@ -38,11 +38,15 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
     /* Context, is needed for starting new activity */
     private final Context context;
 
+    /* Current user */
+    private DBUser user;
+
 
     /* Constructor to the custom adapter that handle the data that the RecyclerView displays */
-    public RVAdapter(List<DBTravel> travels, Context context){
+    public RVAdapter(List<DBTravel> travels, Context context, DBUser user){
         this.travels = travels;
         this.context = context;
+        this.user    = user;
     }
 
 
@@ -76,7 +80,8 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, TravelPage.class);
-                intent.putExtra("travel position", pos);
+                intent.putExtra("travelID", t.getTravelID());
+                intent.putExtra("user", user);
                 context.startActivity(intent);
             }
         });
@@ -108,7 +113,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
             title      = (TextView) itemView.findViewById(R.id.title);
             days       = (TextView) itemView.findViewById(R.id.days);
             background = (ImageView)itemView.findViewById(R.id.background);
-            background.setImageAlpha(80);
+            background.setImageAlpha(80); // Opacity of background
         }
     }
 

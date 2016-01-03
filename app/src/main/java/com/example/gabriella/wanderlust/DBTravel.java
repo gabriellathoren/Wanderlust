@@ -38,6 +38,22 @@ public class DBTravel implements Serializable {
         this.day       = day;
     }
 
+    DBTravel(int id, String title, int year, int month, int day, Bitmap photo){
+        this.travelID  = id;
+        this.title     = title;
+        this.year      = year;
+        this.month     = month;
+        this.day       = day;
+        this.wallpaper = photo;
+    }
+    DBTravel(int id, String title, int year, int month, int day){
+        this.travelID  = id;
+        this.title     = title;
+        this.year      = year;
+        this.month     = month;
+        this.day       = day;
+    }
+
     /* Setters */
     public void setTravelID(int id) {
         this.travelID = id;

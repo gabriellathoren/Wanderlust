@@ -212,7 +212,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         u.setUsername (c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
         u.setPassword (c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
         u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
-        u.setLastName (c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
+        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
 
         c.close();
         db.close();
@@ -281,17 +281,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_TITLE, travel.getTitle());
+        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
         values.put(KEY_TRAVEL_YEAR,      travel.getYear());
-        values.put(KEY_TRAVEL_MONTH, travel.getMonth());
+        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
         values.put(KEY_TRAVEL_DAY,       travel.getDay());
         values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaperAsByte());
 
-        db.update(TABLE_USER, values, KEY_USER_ID + " = ?",
-                new String[]{String.valueOf(travel.getTravelID())});
+        db.update(TABLE_TRAVEL, values, KEY_TRAVEL_ID + " = " + travel.getTravelID(), null);
 
         db.close();
-
     }
 
     /* List all the user's travels */
@@ -300,137 +298,88 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBTravel> travels = new ArrayList<>();
 
-        String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
-                           +  "WHERE " + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = " + TABLE_USER + "." + KEY_USER_ID + " "
-                           +  "AND "   + TABLE_USER    + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "' "
-                           +  "ORDER BY " + TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
+        try {
+            String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
+                               +  "WHERE "    + TABLE_TRAVEL + "." + KEY_USER_ID + " = " + TABLE_USER + "." + KEY_USER_ID + " "
+                               +  "AND "      + TABLE_USER   + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "' "
+                               +  "ORDER BY " + TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
 
-        Log.e(LOG, selectQuery);
+            Log.e(LOG, selectQuery);
+
+            Cursor c = db.rawQuery(selectQuery, null);
+
+            /* Looping through all rows and adding to list */
+            if (c.moveToFirst()) {
+                do {
+                    DBTravel t = new DBTravel();
+                    t.setTravelID(c.getInt   (c.getColumnIndex(KEY_TRAVEL_ID)));
+                    t.setTitle   (c.getString(c.getColumnIndex(KEY_TRAVEL_TITLE)));
+                    t.setYear    (c.getInt   (c.getColumnIndex(KEY_TRAVEL_YEAR)));
+                    t.setMonth   (c.getInt   (c.getColumnIndex(KEY_TRAVEL_MONTH)));
+                    t.setDay     (c.getInt   (c.getColumnIndex(KEY_TRAVEL_DAY)));
 
 
-        Cursor c = db.rawQuery(selectQuery, null);
-
-
-        /* Looping through all rows and adding to list */
-        if (c.moveToFirst()) {
-            do {
-                DBTravel t = new DBTravel();
-                t.setTravelID(c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
-                t.setTitle   (c.getString(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_TITLE)));
-                t.setYear    (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
-                t.setMonth   (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
-                t.setDay     (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
-
-
-                /* Control if the user choose own image as a wallpaper */
-                byte[] bytes = c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER));
-                if (bytes != null)  {
-                    t.setWallpaperFromDatabase(bytes);
-                }
-                /* If not, the travel gets an default background */
-                else {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inScaled = false;
-                    switch(wallpaperColor) {
-
-                        case 1:
-                            Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1, options);
-                            t.setWallpaper(color);
-                            wallpaperColor++;
-                            break;
-
-                        case 2:
-                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2, options);
-                            t.setWallpaper(color);
-                            wallpaperColor++;
-                            break;
-
-                        case 3:
-                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3, options);
-                            t.setWallpaper(color);
-                            wallpaperColor = 1;
-                            break;
+                    /* Control if the user choose own image as a wallpaper */
+                    byte[] bytes = c.getBlob(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
+                    if (bytes != null) {
+                        t.setWallpaperFromDatabase(bytes);
                     }
+                    /* If not, the travel gets an default background */
+                    else {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inScaled = false;
+                        switch (wallpaperColor) {
+
+                            case 1:
+                                Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1, options);
+                                t.setWallpaper(color);
+                                wallpaperColor++;
+                                break;
+
+                            case 2:
+                                color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2, options);
+                                t.setWallpaper(color);
+                                wallpaperColor++;
+                                break;
+
+                            case 3:
+                                color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3, options);
+                                t.setWallpaper(color);
+                                wallpaperColor = 1;
+                                break;
+                        }
+                    }
+                    travels.add(t);
                 }
-                travels.add(t);
+                while (c.moveToNext());
             }
-            while (c.moveToNext());
-        }
 
         c.close();
         db.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return travels;
 
     }
 
 
-    /* Get a single travel
-    public DBTravel getTravel(int position, DBUser user) {
+    /* Get a single travel by giving the position of the travel to search for */
+    public DBTravel getTravel(int travelID, DBUser user) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        List<DBTravel> travels = new ArrayList<>();
+        DBTravel travel = new DBTravel();
 
         String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
-                           +  "WHERE "    + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = " + TABLE_USER + "." + KEY_USER_ID + " "
-                           +  "AND "      + TABLE_USER    + "." + KEY_USER_USERNAME + " = '" + user.getUsername() + "' "
-                           +  "ORDER BY " + TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
+                           +  "WHERE "    + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = "    + TABLE_USER + "." + KEY_USER_ID + " "
+                           +  "AND "      + TABLE_USER    + "." + KEY_USER_USERNAME + " = '"   + user.getUsername() + "' "
+                           +  "AND "      + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID     + " = "    + travelID     + " "
+                           +  "ORDER BY " + TABLE_TRAVEL  + "." + KEY_TRAVEL_YEAR   + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
 
         Log.e(LOG, selectQuery);
 
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-
-        /* Looping through all rows and adding to list
-        if (c.moveToFirst()) {
-            do {
-                DBTravel t = new DBTravel();
-                t.setTravelID(c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_ID)));
-                t.setTitle   (c.getString(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_TITLE)));
-                t.setYear    (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_YEAR)));
-                t.setMonth   (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH)));
-                t.setDay     (c.getInt   (c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_DAY)));
-
-
-                /* Control if the user choose own image as a wallpaper
-                byte[] bytes = c.getBlob(c.getColumnIndex(TABLE_TRAVEL + "." + KEY_TRAVEL_WALLPAPER));
-                if (bytes != null)  {
-                    t.setWallpaperFromDatabase(bytes);
-                }
-                /* If not, the travel gets an default background
-                else {
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inScaled = false;
-                    switch(wallpaperColor) {
-
-                        case 1:
-                            Bitmap color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg1, options);
-                            t.setWallpaper(color);
-                            wallpaperColor++;
-                            break;
-
-                        case 2:
-                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg2, options);
-                            t.setWallpaper(color);
-                            wallpaperColor++;
-                            break;
-
-                        case 3:
-                            color = BitmapFactory.decodeResource(context.getResources(), R.drawable.backg3, options);
-                            t.setWallpaper(color);
-                            wallpaperColor = 1;
-                            break;
-                    }
-                }
-                travels.add(t);
-            }
-            while (c.moveToNext());
-        }
-
-        String selectQuery = "SELECT * FROM " + TABLE_TRAVEL + " "
-                           + "WHERE " + KEY_TRAVEL_ID + " = " + travel.getTravelID();
-
-        Log.e(LOG, selectQuery);
 
         Cursor c = db.rawQuery(selectQuery, null);
 
@@ -440,18 +389,23 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         DBTravel t = new DBTravel();
         t.setTravelID(c.getInt(c.getColumnIndex(KEY_TRAVEL_ID)));
+        t.setTitle(c.getString(c.getColumnIndex(KEY_TRAVEL_TITLE)));
         t.setYear(c.getInt(c.getColumnIndex(KEY_TRAVEL_YEAR)));
         t.setMonth(c.getInt(c.getColumnIndex(KEY_TRAVEL_MONTH)));
         t.setDay(c.getInt(c.getColumnIndex(KEY_TRAVEL_DAY)));
-        t.setWallpaper(c.getInt(c.getColumnIndex(KEY_TRAVEL_WALLPAPER)));
 
+        /* Control if the user choose own image as a wallpaper */
+        byte[] bytes = c.getBlob(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
+        if (bytes != null) {
+            t.setWallpaperFromDatabase(bytes);
+        }
 
         c.close();
         db.close();
 
         return t;
     }
-*/
+
 
 
     /* METHODS FOR ACCESSING THE TABLE COUNTRY */
@@ -463,7 +417,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         String selectQuery = ("SELECT " + KEY_COUNTRY_NAME     + " "
                            +  "FROM "   + TABLE_COUNTRY        + "," + TABLE_TRAVEL_COUNTRY   + "," + TABLE_TRAVEL   + " "
-                           +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL  + "." + KEY_TRAVEL_ID
+                           +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL + "." + KEY_TRAVEL_ID
                            +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
                 + "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
 
@@ -492,10 +446,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
-        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                +  "FROM "     + TABLE_COUNTRY        + ", "
-                + "WHERE " + KEY_COUNTRY_CONTINENT + "= 'Africa' "
-                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
+                           +  "FROM "     + TABLE_COUNTRY         + ", "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
 

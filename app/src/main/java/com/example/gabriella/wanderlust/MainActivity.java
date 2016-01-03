@@ -52,22 +52,10 @@ public class MainActivity extends AppCompatActivity  {
         /* Initialize database helper */
         db = new SQLiteHelper(getApplicationContext());
 
-        /*DBUser user1 = new DBUser("g", "w", "Gabriella", "Thorén");
+        /*
+        DBUser user1 = new DBUser("g", "w", "Gabriella", "Thorén");
         db.createUser(user1);
-
-        db.deleteTravel(1);
-        db.deleteTravel(2);
-        db.deleteTravel(3);
-        db.deleteTravel(4);
-        db.deleteTravel(5);
-        db.deleteTravel(6);
-        db.deleteTravel(7);
-        db.deleteTravel(8);
-        db.deleteTravel(9);
-        db.deleteTravel(10);
         */
-
-
 
         /* Sets Button and EditTexts to the related buttons and EditTexts in xml-code */
         loginButton = (Button)  findViewById(R.id.login_button);
