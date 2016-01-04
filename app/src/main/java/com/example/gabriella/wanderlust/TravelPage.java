@@ -49,6 +49,7 @@ public class TravelPage extends AppCompatActivity {
 
     /* Path to the wallpaper image */
     Bitmap wallpaperBM;
+    String picturePath;
     private static int RESULT_LOAD_IMAGE = 1;
 
 
@@ -97,9 +98,10 @@ public class TravelPage extends AppCompatActivity {
         travelTitle.setText(travel.getTitle());
 
         /* Set background */
-        if (travel.getWallpaper() != null) {
+        if (travel.getPicturePath() != null) {
             /* If there is a stored background */
-            wallpaper.setImageBitmap(travel.getResizedWallpaper());
+            wallpaper.setImageBitmap(travel.getWallpaper());
+            picturePath = travel.getPicturePath();
         }
         else {
             /* If there isn't a stored background */
@@ -150,7 +152,6 @@ public class TravelPage extends AppCompatActivity {
                     });
         }
         else {
-
             DBTravel updatedTravel;
 
             /* Get the user's text input */
@@ -160,13 +161,13 @@ public class TravelPage extends AppCompatActivity {
             int day      = datePicker .getDayOfMonth();
 
             /* Initialize travel */
-            if (wallpaperBM == null) {
-                /* If the user didn't select a image */
-                updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day);
+            if (picturePath != null) {
+                /* If the user selected own image as wallpaper */
+                updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day, picturePath);
             }
             else {
-                /* If the user selected own image as wallpaper */
-                updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day, wallpaperBM);
+                /* If the user didn't select a image */
+                updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day);
             }
 
 
@@ -181,8 +182,8 @@ public class TravelPage extends AppCompatActivity {
     }
 
     /* OnClickHandler for the floating action button in activity_add so that the user can choose
-     * a wallpaper for the travel, otherwice there will be an standard picture.
-     */
+    * a wallpaper for the travel, otherwice there will be an standard picture.
+    */
     public void wallpaperHandler(View view) {
 
         /* Initialize the ImageView with the related xml-component */
@@ -212,18 +213,23 @@ public class TravelPage extends AppCompatActivity {
             /* Set a string with the file path to the image */
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
-            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
+            Cursor c = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            c.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+            int columnIndex = c.getColumnIndex(filePathColumn[0]);
+            picturePath = c.getString(columnIndex);
+            c.close();
 
-            /* Set imageview to the new image */
+            /* Set ImageView to the new image */
             DBTravel t = new DBTravel();
-            t.setWallpaper(BitmapFactory.decodeFile(picturePath));
-            wallpaperBM = t.getResizedWallpaper(); // Must be done to get a resized Bitmap
+            t.setWallpaper(picturePath);
+            wallpaperBM = t.getWallpaper(); // Must be done to get a resized Bitmap
             wallpaper.setImageBitmap(wallpaperBM);
+
+            /*
+            wallpaper.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            wallpaperBM = BitmapFactory.decodeFile(picturePath);
+            */
         }
     }
 }

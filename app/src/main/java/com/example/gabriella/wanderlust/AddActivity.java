@@ -49,10 +49,13 @@ public class AddActivity extends AppCompatActivity {
     DatePicker  datePicker;
     ImageView   wallpaper;
 
-    /* Path to the wallpaper image*/
+    /* Path to the wallpaper image */
+    String picturePath;
     Bitmap wallpaperBM;
 
     private static int RESULT_LOAD_IMAGE = 1;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,70 +85,75 @@ public class AddActivity extends AppCompatActivity {
         imageButton.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) {
-
-                        /* Check if title is empty and alert user */
-                        if (travelTitle.getText().toString().matches("")) {
-                            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-                            dlgAlert.setMessage("You did not write a title for this travel");
-                            dlgAlert.setTitle("Wrong input");
-                            dlgAlert.setPositiveButton("Try again", null);
-                            dlgAlert.setCancelable(false);
-                            dlgAlert.create().show();
-
-                            dlgAlert.setPositiveButton("Try again",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                        }
-                                    });
-                        }
-                        /* Check if text is longer then 17 characters */
-                        else if (travelTitle.getText().toString().length() > 17) {
-                            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-                            dlgAlert.setMessage("The title is too long, maximum number of characters is 17");
-                            dlgAlert.setTitle("Wrong input");
-                            dlgAlert.setPositiveButton("Try again", null);
-                            dlgAlert.setCancelable(false);
-                            dlgAlert.create().show();
-
-                            dlgAlert.setPositiveButton("Try again",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                        }
-                                    });
-                        }
-                        else {
-                            /* Get the user's text input */
-                            String title = travelTitle.getText().toString();
-                            int year     = datePicker .getYear();
-                            int month    = datePicker .getMonth();
-                            int day      = datePicker .getDayOfMonth();
-
-                            /* Initialize travel */
-                            if (wallpaperBM == null) {
-                                /* If the user didn't select a image */
-                                travel = new DBTravel(title, year, month, day);
-                            }
-                            else {
-                                /* If the user selected own image as wallpaper */
-                                travel = new DBTravel(title, year, month, day, wallpaperBM);
-                            }
-
-                            /* Insert the values in database */
-                            db.createTravel(travel, user);
-
-                            /* Go back to the StartPage when the new travel has been stored in the database*/
-                            Intent intent = new Intent(context, StartPage.class);
-                            intent.putExtra("user", user);
-                            startActivity(intent);
-
-                        }
+                        addImage();
                     }
                 }
         );
+    }
+
+
+
+    public void addImage() {
+        /* Check if title is empty and alert user */
+        if (travelTitle.getText().toString().matches("")) {
+            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
+
+            dlgAlert.setMessage("You did not write a title for this travel");
+            dlgAlert.setTitle("Wrong input");
+            dlgAlert.setPositiveButton("Try again", null);
+            dlgAlert.setCancelable(false);
+            dlgAlert.create().show();
+
+            dlgAlert.setPositiveButton("Try again",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+        }
+        /* Check if text is longer then 17 characters */
+        else if (travelTitle.getText().toString().length() > 17) {
+            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
+
+            dlgAlert.setMessage("The title is too long, maximum number of characters is 17");
+            dlgAlert.setTitle("Wrong input");
+            dlgAlert.setPositiveButton("Try again", null);
+            dlgAlert.setCancelable(false);
+            dlgAlert.create().show();
+
+            dlgAlert.setPositiveButton("Try again",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+        }
+        else {
+            /* Get the user's text input */
+            String title = travelTitle.getText().toString();
+            int year     = datePicker .getYear();
+            int month    = datePicker .getMonth();
+            int day      = datePicker .getDayOfMonth();
+
+            /* Initialize travel */
+            if (wallpaperBM == null) {
+                /* If the user didn't select a image */
+                travel = new DBTravel(title, year, month, day);
+            }
+            else {
+                /* If the user selected own image as wallpaper */
+                travel = new DBTravel(title, year, month, day, picturePath);
+            }
+
+            /* Insert the values in database */
+            db.createTravel(travel, user);
+
+            /* Go back to the StartPage when the new travel has been stored in the database*/
+            Intent intent = new Intent(context, StartPage.class);
+            intent.putExtra("user", user);
+            startActivity(intent);
+
+        }
     }
 
 
@@ -181,17 +189,17 @@ public class AddActivity extends AppCompatActivity {
             /* Set a string with the file path to the image */
             String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
-            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
+            Cursor c = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            c.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+            int columnIndex = c.getColumnIndex(filePathColumn[0]);
+            picturePath = c.getString(columnIndex);
+            c.close();
 
             /* Set ImageView to the new image */
             DBTravel t = new DBTravel();
-            t.setWallpaper(BitmapFactory.decodeFile(picturePath));
-            wallpaperBM = t.getResizedWallpaper(); // Must be done to get a resized Bitmap
+            t.setWallpaper(picturePath);
+            wallpaperBM = t.getWallpaper(); // Must be done to get a resized Bitmap
             wallpaper.setImageBitmap(wallpaperBM);
 
             /*

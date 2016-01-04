@@ -76,7 +76,10 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         long days = diff / (24 * 60 * 60 * 1000);
 
         travelViewHolder.days.setText(String.valueOf(days));
-        travelViewHolder.background.setImageBitmap(t.getResizedWallpaper());
+        try {
+            travelViewHolder.background.setImageBitmap(t.getWallpaper());
+        }
+        catch (OutOfMemoryError e) {}
 
         travelViewHolder.background.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +118,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
             title      = (TextView) itemView.findViewById(R.id.title);
             days       = (TextView) itemView.findViewById(R.id.days);
             background = (ImageView)itemView.findViewById(R.id.background);
-            background.setImageAlpha(80); // Opacity of background
+            background.setImageAlpha(100); // Opacity of background
         }
     }
 

@@ -75,7 +75,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             + KEY_TRAVEL_YEAR      + " INTEGER NOT NULL, "
             + KEY_TRAVEL_MONTH     + " INTEGER NOT NULL, "
             + KEY_TRAVEL_DAY       + " INTEGER NOT NULL, "
-            + KEY_TRAVEL_WALLPAPER + " BLOB, "
+            + KEY_TRAVEL_WALLPAPER + " STRING, "
             + KEY_USER_ID          + " INTEGER NOT NULL, "
             + "FOREIGN KEY (" + KEY_USER_ID + ") REFERENCES " + TABLE_USER + "(" + KEY_USER_ID + "))";
 
@@ -256,11 +256,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         /* Save the data in ContentValues to store it in database */
         ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_TITLE, travel.getTitle());
-        values.put(KEY_TRAVEL_YEAR,  travel.getYear());
-        values.put(KEY_TRAVEL_MONTH, travel.getMonth());
-        values.put(KEY_TRAVEL_DAY,   travel.getDay());
-        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaperAsByte());
+        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
+        values.put(KEY_TRAVEL_YEAR,      travel.getYear());
+        values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
+        values.put(KEY_TRAVEL_DAY,       travel.getDay());
+        values.put(KEY_TRAVEL_WALLPAPER, travel.getPicturePath());
         values.put(KEY_USER_ID,          user.getUserID());
 
         /* Insert row to the table user*/
@@ -285,7 +285,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_TRAVEL_YEAR,      travel.getYear());
         values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
         values.put(KEY_TRAVEL_DAY,       travel.getDay());
-        values.put(KEY_TRAVEL_WALLPAPER, travel.getWallpaperAsByte());
+        values.put(KEY_TRAVEL_WALLPAPER, travel.getPicturePath());
 
         db.update(TABLE_TRAVEL, values, KEY_TRAVEL_ID + " = " + travel.getTravelID(), null);
 
@@ -320,9 +320,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
 
                     /* Control if the user choose own image as a wallpaper */
-                    byte[] bytes = c.getBlob(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
-                    if (bytes != null) {
-                        t.setWallpaperFromDatabase(bytes);
+                    String path = c.getString(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
+                    if (path != null) {
+                        t.setWallpaper(path);
                     }
                     /* If not, the travel gets an default background */
                     else {
@@ -388,16 +388,16 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
 
         DBTravel t = new DBTravel();
-        t.setTravelID(c.getInt(c.getColumnIndex(KEY_TRAVEL_ID)));
-        t.setTitle(c.getString(c.getColumnIndex(KEY_TRAVEL_TITLE)));
-        t.setYear(c.getInt(c.getColumnIndex(KEY_TRAVEL_YEAR)));
-        t.setMonth(c.getInt(c.getColumnIndex(KEY_TRAVEL_MONTH)));
-        t.setDay(c.getInt(c.getColumnIndex(KEY_TRAVEL_DAY)));
+        t.setTravelID(c.getInt   (c.getColumnIndex(KEY_TRAVEL_ID)));
+        t.setTitle   (c.getString(c.getColumnIndex(KEY_TRAVEL_TITLE)));
+        t.setYear    (c.getInt   (c.getColumnIndex(KEY_TRAVEL_YEAR)));
+        t.setMonth   (c.getInt   (c.getColumnIndex(KEY_TRAVEL_MONTH)));
+        t.setDay     (c.getInt   (c.getColumnIndex(KEY_TRAVEL_DAY)));
 
         /* Control if the user choose own image as a wallpaper */
-        byte[] bytes = c.getBlob(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
-        if (bytes != null) {
-            t.setWallpaperFromDatabase(bytes);
+        String path = c.getString(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
+        if (path != null) {
+            t.setWallpaper(path);
         }
 
         c.close();
