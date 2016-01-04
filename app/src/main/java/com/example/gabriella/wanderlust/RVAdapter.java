@@ -3,6 +3,7 @@ package com.example.gabriella.wanderlust;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.opengl.GLES10;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +22,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.microedition.khronos.opengles.GL10;
 
 /**
  *  Adapter that follows the view holder design pattern and reuses the card view layout (item.xml).
@@ -56,7 +59,6 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
     @Override
     public void onBindViewHolder(TravelViewHolder travelViewHolder, int position) {
         final DBTravel t = travels.get(position);
-        final int    pos = position;
 
         /* Set title */
         travelViewHolder.title.setText(t.getTitle());
@@ -64,8 +66,8 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         /* Travel date */
         Calendar thatDay = Calendar.getInstance();
         thatDay.set(Calendar.DAY_OF_MONTH, t.getDay());
-        thatDay.set(Calendar.MONTH,t.getMonth()); // 0-11 so 1 less
-        thatDay.set(Calendar.YEAR, t.getYear());
+        thatDay.set(Calendar.MONTH,        t.getMonth()); // 0-11 so 1 less
+        thatDay.set(Calendar.YEAR,         t.getYear());
 
         /* Today's date */
         Calendar today = Calendar.getInstance();
@@ -74,7 +76,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         long days = diff / (24 * 60 * 60 * 1000);
 
         travelViewHolder.days.setText(String.valueOf(days));
-        travelViewHolder.background.setImageBitmap(t.getWallpaper());
+        travelViewHolder.background.setImageBitmap(t.getResizedWallpaper());
 
         travelViewHolder.background.setOnClickListener(new View.OnClickListener() {
             @Override

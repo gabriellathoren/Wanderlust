@@ -99,7 +99,7 @@ public class TravelPage extends AppCompatActivity {
         /* Set background */
         if (travel.getWallpaper() != null) {
             /* If there is a stored background */
-            wallpaper.setImageBitmap(travel.getWallpaper());
+            wallpaper.setImageBitmap(travel.getResizedWallpaper());
         }
         else {
             /* If there isn't a stored background */
@@ -220,8 +220,10 @@ public class TravelPage extends AppCompatActivity {
             cursor.close();
 
             /* Set imageview to the new image */
-            wallpaper.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-            wallpaperBM = BitmapFactory.decodeFile(picturePath);
+            DBTravel t = new DBTravel();
+            t.setWallpaper(BitmapFactory.decodeFile(picturePath));
+            wallpaperBM = t.getResizedWallpaper(); // Must be done to get a resized Bitmap
+            wallpaper.setImageBitmap(wallpaperBM);
         }
     }
 }

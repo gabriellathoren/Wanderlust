@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES10;
 import android.opengl.GLSurfaceView;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -24,6 +25,9 @@ public class DBTravel implements Serializable {
     private int month;
     private int day;
     private Bitmap wallpaper;
+
+    /* For logging */
+    private final static String LOG_TAG = StartPage.class.getSimpleName();
 
     /* Constructors */
     DBTravel(){}
@@ -111,30 +115,34 @@ public class DBTravel implements Serializable {
         return this.day;
     }
 
+    public Bitmap getWallpaper() {
+        return this.wallpaper;
+    }
+
     /* Returns a scaled Bitmap, which is needed to display a too big of an image in ImageView, the
      * maxsize is the possible maxsize of the image to be shown in the ImageView. */
-    public Bitmap getWallpaper() {
-        /* Get the maximum texture size of the device and convert the int[1] to and int */
-        int[] maxTextureSize = new int[1];
-        GLES10.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
-        StringBuilder convert = new StringBuilder();
-        convert.append(maxTextureSize);
-        int maxSize = Integer.parseInt(convert.toString());
+    public Bitmap getResizedWallpaper() {
+        Log.d(LOG_TAG, "Bitmap getWallpaper()");
+
+        final int maxSize = 3000;
 
         /* Get width and height of wallpaper */
-        int width  = wallpaper.getWidth();
-        int height = wallpaper.getHeight();
+        int width  = this.wallpaper.getWidth();
+        int height = this.wallpaper.getHeight();
 
         /* Set new width or height depending on if the picture is horizontal or vertical */
         float bitmapRatio = (float)width / (float) height;
         if (bitmapRatio > 1) {
             width  = maxSize;
             height = (int) (width / bitmapRatio);
+            Log.d(LOG_TAG, "width: " + width + " height: " + height);
         } else {
             height = maxSize;
             width  = (int) (height * bitmapRatio);
+            Log.d(LOG_TAG, "width: " + width + " height: " + height);
         }
-        return Bitmap.createScaledBitmap(wallpaper, width, height, true);
+
+        return Bitmap.createScaledBitmap(this.wallpaper, width, height, true);
     }
 
 
@@ -147,7 +155,7 @@ public class DBTravel implements Serializable {
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        wallpaper.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        wallpaper.compress(Bitmap.CompressFormat.JPEG, 0, outputStream);
 
         return outputStream.toByteArray();
     }

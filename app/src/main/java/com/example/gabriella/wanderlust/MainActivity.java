@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity  {
         /*
         DBUser user1 = new DBUser("g", "w", "Gabriella", "Thorén");
         db.createUser(user1);
-        */
+*/
 
         /* Sets Button and EditTexts to the related buttons and EditTexts in xml-code */
         loginButton = (Button)  findViewById(R.id.login_button);

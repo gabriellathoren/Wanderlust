@@ -188,10 +188,10 @@ public class AddActivity extends AppCompatActivity {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
 
-            /* Set imageview to the new image */
+            /* Set ImageView to the new image */
             DBTravel t = new DBTravel();
             t.setWallpaper(BitmapFactory.decodeFile(picturePath));
-            wallpaperBM = t.getWallpaper(); // Must be done to get a resize Bitmap
+            wallpaperBM = t.getResizedWallpaper(); // Must be done to get a resized Bitmap
             wallpaper.setImageBitmap(wallpaperBM);
 
             /*
