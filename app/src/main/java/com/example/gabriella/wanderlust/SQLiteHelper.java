@@ -128,11 +128,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID,         user.getUserID());
         values.put(KEY_USER_USERNAME,   user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
+        values.put(KEY_USER_LAST_NAME,  user.getLastName());
 
         /* Insert row */
         db.insert(TABLE_USER, null, values);
@@ -163,35 +162,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-
-    /* Get user information by id */
-    public DBUser getUser(long user_id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String selectQuery = "SELECT * FROM " + TABLE_USER + " WHERE "
-                             + KEY_USER_ID + " = " + user_id;
-
-        Log.e(LOG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        if (c != null) {
-            c.moveToFirst();
-        }
-
-        DBUser u = new DBUser();
-        u.setUserID(c.getInt(c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
-        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
-        u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
-        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
-
-        c.close();
-        db.close();
-
-        return u;
-    }
-
     /* Get user information by username */
     public DBUser getUser(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -209,8 +179,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         DBUser u = new DBUser();
         u.setUserID   (c.getInt   (c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername (c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
-        u.setPassword (c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
+        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
+        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
         u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
         u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
 
@@ -228,6 +198,32 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_USER + " "
                            + "WHERE " + KEY_USER_USERNAME  + " = '" + username + "' "
                            + "AND "   + KEY_USER_PASSWORD  + " = '" + password + "'";
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        /* Check if user does not exist */
+        if (c.getCount() <= 0) {
+            c.close();
+            db.close();
+            return false;
+        }
+
+        c.close();
+        db.close();
+
+        /* User exists */
+        return true;
+    }
+
+    /* Check if user exists */
+    public Boolean ifUserExists(String username) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_USER + " "
+                           + "WHERE " + KEY_USER_USERNAME  + " = '" + username + "' ";
 
         Log.e(LOG, selectQuery);
 
@@ -268,11 +264,22 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /* Delete wallpaper */
+    public void deleteWallpaper(DBTravel travel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.putNull(KEY_TRAVEL_WALLPAPER);
+
+        db.update(TABLE_TRAVEL, values, KEY_TRAVEL_ID + " = ?",
+                  new String[] {String.valueOf(travel.getTravelID())});
+    }
+
 
     /* Delete travel */
-    public void deleteTravel(long travelID) {
+    public void deleteTravel(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travelID)});
+        db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travel.getTravelID())});
         db.close();
     }
 

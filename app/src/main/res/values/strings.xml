@@ -8,12 +8,16 @@
     <string name="login_register_text">REGISTER</string>
     <string name="login_forgot_password_text">Forgot your username or password?</string>
     <string name="login_password_text">password</string>
-    <string name="login_username_text">username</string>
+    <string name="login_username_text">e-mail</string>
     <string name="icon_desc">appicon</string>
 
+    <!-- Strings for registration -->
+    <string name="reg_title">REGISTRATION</string>
+    <string name="reg_first_name">first name</string>
+    <string name="reg_sir_name">sir name</string>
+    <string name="reg_verify_password">verify password</string>
 
     <!-- Strings for toolbar -->
-    <string name="settings_desc">setting icon</string>
     <string name="toolbar_title_desc">logo name</string>
 
     <!-- Strings for StartPage -->
@@ -22,4 +26,8 @@
     <!-- Strings for AddActivity -->
     <string name="title_header">Title</string>
     <string name="travel_date_header">Travel date</string>
+
+    <!-- Strings for TravelPage -->
+    <string name="remove_title">Delete</string>
+
 </resources>

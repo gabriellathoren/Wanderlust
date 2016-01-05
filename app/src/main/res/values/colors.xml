@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
      <!-- Theme colors -->
-    <color name="primary_theme_color">#93e1d8</color>
+    <color name="primary_theme_color"  >#93e1d8</color>
     <color name="lightblue_theme_color">#DDFFF7</color>
-    <color name="peach_theme_color">#FFA69E</color>
-    <color name="red_theme_color">#AA4465</color>
-    <color name="purple_theme_color">#861657</color>
-    <color name="pink_theme_color">#FDCAC9</color>
+    <color name="peach_theme_color"    >#FFA69E</color>
+    <color name="red_theme_color"      >#AA4465</color>
+    <color name="purple_theme_color"   >#861657</color>
+    <color name="pink_theme_color"     >#FDCAC9</color>
+
+    <!-- Colors for delete button -->
+    <color name="delete_red_1">#99d9534f</color>
+    <color name="delete_red_2">#99d43f3a</color>
 
     <!-- Transparent colors -->
     <color name="transparent_white22">#22FFFFFF</color>
     <color name="transparent_white44">#44FFFFFF</color>
     <color name="transparent_white55">#55FFFFFF</color>
     <color name="transparent_white99">#99FFFFFF</color>
-    <color name="lightpurple">#88861657</color>
-    <color name="light">#99DDFFF7</color>
+    <color name="lightpurple"        >#88861657</color>
+    <color name="light"              >#99DDFFF7</color>
 
 
 </resources>

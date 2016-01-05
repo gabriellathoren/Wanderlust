@@ -48,6 +48,7 @@ public class AddActivity extends AppCompatActivity {
     EditText    travelTitle;
     DatePicker  datePicker;
     ImageView   wallpaper;
+    ImageButton remove;
 
     /* Path to the wallpaper image */
     String picturePath;
@@ -73,8 +74,8 @@ public class AddActivity extends AppCompatActivity {
         user = (DBUser)getIntent().getSerializableExtra("user");
 
         /* Initialize components with the related xml-components */
-        datePicker = (DatePicker) findViewById(R.id.travel_date_picker);
-        travelTitle = (EditText) findViewById(R.id.travel_title);
+        datePicker  = (DatePicker) findViewById(R.id.travel_date_picker);
+        travelTitle = (EditText)   findViewById(R.id.travel_title);
 
         /* Change the settings button in toolbar to an OK-button which the user clicks on when
          * done with their input for adding travel
@@ -89,6 +90,15 @@ public class AddActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        remove = (ImageButton) findViewById(R.id.remove_button);
+        remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeImage();
+            }
+        });
+
     }
 
 
@@ -143,6 +153,7 @@ public class AddActivity extends AppCompatActivity {
             else {
                 /* If the user selected own image as wallpaper */
                 travel = new DBTravel(title, year, month, day, picturePath);
+
             }
 
             /* Insert the values in database */
@@ -154,6 +165,15 @@ public class AddActivity extends AppCompatActivity {
             startActivity(intent);
 
         }
+    }
+
+    /* Deletes selected wallpaper */
+    public void removeImage() {
+        /* Default ImageView */
+        Bitmap image = BitmapFactory.decodeResource(this.getResources(), R.drawable.image);
+        wallpaper.setImageBitmap(image);
+
+        wallpaperBM = null;
     }
 
 
@@ -202,10 +222,8 @@ public class AddActivity extends AppCompatActivity {
             wallpaperBM = t.getWallpaper(); // Must be done to get a resized Bitmap
             wallpaper.setImageBitmap(wallpaperBM);
 
-            /*
-            wallpaper.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-            wallpaperBM = BitmapFactory.decodeFile(picturePath);
-            */
+            /* Set visibility on remove image button if there are a image in ImageView */
+            remove.setVisibility(View.VISIBLE);
         }
     }
 

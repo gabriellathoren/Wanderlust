@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -46,6 +48,8 @@ public class TravelPage extends AppCompatActivity {
     EditText    travelTitle;
     DatePicker  datePicker;
     ImageView   wallpaper;
+    ImageButton remove;
+    Button      delete;
 
     /* Path to the wallpaper image */
     Bitmap wallpaperBM;
@@ -73,6 +77,21 @@ public class TravelPage extends AppCompatActivity {
         datePicker  = (DatePicker) findViewById(R.id.travel_date_picker);
         travelTitle = (EditText)   findViewById(R.id.travel_title);
         wallpaper   = (ImageView)  findViewById(R.id.backgroundSetter);
+        remove      = (ImageButton)findViewById(R.id.remove_button);
+        delete      = (Button)     findViewById(R.id.delete_button);
+
+        /* Make delete button visible */
+        delete.setVisibility(View.VISIBLE);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                delete();
+            }
+        });
+
+        /* Reduce size of datePicker to have room for delete button */
+        datePicker.getLayoutParams().height = 10;
+        datePicker.requestLayout();
 
         /* Change the settings button in toolbar to an OK-button which the user clicks on when
          * done with their input for updating travel.
@@ -102,6 +121,15 @@ public class TravelPage extends AppCompatActivity {
             /* If there is a stored background */
             wallpaper.setImageBitmap(travel.getWallpaper());
             picturePath = travel.getPicturePath();
+
+            /* Set visibility on remove image button if there are a image in ImageView */
+            remove.setVisibility(View.VISIBLE);
+            remove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    removeImage();
+                    }
+                });
         }
         else {
             /* If there isn't a stored background */
@@ -113,6 +141,26 @@ public class TravelPage extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    public void delete() {
+        db.deleteTravel(travel);
+
+        /* Go back to the StartPage when the new travel has been stored in the database */
+        Intent intent = new Intent(this, StartPage.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
+    }
+
+    public void removeImage() {
+        db.deleteWallpaper(travel);
+
+        /* Default ImageView */
+        Bitmap image = BitmapFactory.decodeResource(this.getResources(), R.drawable.image);
+        wallpaper.setImageBitmap(image);
+
+        picturePath = null;
+
     }
 
     public void save() {
@@ -226,10 +274,9 @@ public class TravelPage extends AppCompatActivity {
             wallpaperBM = t.getWallpaper(); // Must be done to get a resized Bitmap
             wallpaper.setImageBitmap(wallpaperBM);
 
-            /*
-            wallpaper.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-            wallpaperBM = BitmapFactory.decodeFile(picturePath);
-            */
+            /* Set visibility on remove image button if there are a image in ImageView */
+            remove.setVisibility(View.VISIBLE);
+
         }
     }
 }

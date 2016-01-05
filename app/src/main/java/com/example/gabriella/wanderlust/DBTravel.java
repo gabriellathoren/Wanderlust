@@ -2,19 +2,12 @@ package com.example.gabriella.wanderlust;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.opengl.GLES10;
-import android.opengl.GLSurfaceView;
-import android.util.Base64;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
-import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Created by Gabriella on 2015-12-23.
- *
  * A model class that handles the table travel
  */
 public class DBTravel implements Serializable {
