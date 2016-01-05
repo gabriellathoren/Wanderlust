@@ -88,10 +88,7 @@ public class TravelPage extends AppCompatActivity {
                 delete();
             }
         });
-
-        /* Reduce size of datePicker to have room for delete button */
-        datePicker.getLayoutParams().height = 10;
-        datePicker.requestLayout();
+        
 
         /* Change the settings button in toolbar to an OK-button which the user clicks on when
          * done with their input for updating travel.

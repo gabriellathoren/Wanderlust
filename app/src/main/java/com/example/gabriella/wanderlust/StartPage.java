@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
 
@@ -25,8 +26,9 @@ public class StartPage extends AppCompatActivity {
 
     /* Layout components */
     private List<DBTravel> travels;
-    private RecyclerView rv;
-    private RVAdapter ra;
+    private RecyclerView   rv;
+    private RVAdapter      ra;
+    private ImageButton    account;
 
     /* Current user */
     DBUser user;
@@ -65,6 +67,23 @@ public class StartPage extends AppCompatActivity {
         ra = new RVAdapter(travels, context, user);
         rv.setAdapter(ra);
 
+        /* OnClickListener to user account */
+        account = (ImageButton)findViewById(R.id.settings);
+        account.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                account();
+            }
+        });
+
+
+    }
+
+    /* Start activity for account */
+    public void account() {
+        Intent intent = new Intent(this, AccountActivity.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
     }
 
     /* Sets view to AddActivity when user presses the Floating Action Button for adding travels */
@@ -96,9 +115,5 @@ public class StartPage extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
     }
-    /* Method that shows new activity after clicking cardview
-    public void travelLayout(View view) {
-        Intent intent = new Intent(this, TravelPage.class);
-        startActivity(intent);
-    }*/
+
 }
