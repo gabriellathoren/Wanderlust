@@ -32,10 +32,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private int wallpaperColor = 1;
 
     /* Table names */
-    private static final String TABLE_USER           = "user";
-    private static final String TABLE_COUNTRY        = "country";
-    private static final String TABLE_TRAVEL         = "travel";
-    private static final String TABLE_TRAVEL_COUNTRY = "travel_country";
+    private static final String TABLE_USER         = "user";
+    private static final String TABLE_COUNTRY      = "country";
+    private static final String TABLE_TRAVEL       = "travel";
+    private static final String TABLE_USER_COUNTRY = "user_country";
 
     /* User table - column names */
     private static final String KEY_USER_ID         = "user_ID";
@@ -79,12 +79,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             + KEY_USER_ID          + " INTEGER NOT NULL, "
             + "FOREIGN KEY (" + KEY_USER_ID + ") REFERENCES " + TABLE_USER + "(" + KEY_USER_ID + "))";
 
-    private static final String CREATE_TABLE_TRAVEL_COUNTRY = "create table  if not exists " + TABLE_TRAVEL_COUNTRY + "("
-            + KEY_COUNTRY_NAME + " TEXT UNIQUE, "
-            + KEY_TRAVEL_ID    + " INTEGER UNIQUE, "
-            + "PRIMARY KEY ("  + KEY_COUNTRY_NAME + "," + KEY_TRAVEL_ID + ") "
-            + "FOREIGN KEY ("  + KEY_COUNTRY_NAME + ") REFERENCES " + TABLE_COUNTRY + "(" + KEY_COUNTRY_NAME + "), "
-            + "FOREIGN KEY ("  + KEY_TRAVEL_ID    + ") REFERENCES " + TABLE_TRAVEL  + "(" + KEY_TRAVEL_ID    + "))";
+    private static final String CREATE_TABLE_USER_COUNTRY = "create table  if not exists " + TABLE_USER_COUNTRY + "("
+            + KEY_USER_ID      + " INTEGER, "
+            + KEY_COUNTRY_NAME + " TEXT, "
+            + "PRIMARY KEY ("  + KEY_USER_ID  + "," + KEY_COUNTRY_NAME + ") "
+            + "FOREIGN KEY ("  + KEY_USER_ID      + ") REFERENCES " + TABLE_USER     + "(" + KEY_USER_ID      + "), "
+            + "FOREIGN KEY ("  + KEY_COUNTRY_NAME + ") REFERENCES " + TABLE_COUNTRY  + "(" + KEY_COUNTRY_NAME + "))";
+
 
 
     /* Constructor */
@@ -100,7 +101,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_COUNTRY);
         db.execSQL(CREATE_TABLE_TRAVEL);
-        db.execSQL(CREATE_TABLE_TRAVEL_COUNTRY);
+        db.execSQL(CREATE_TABLE_USER_COUNTRY);
 
     }
 
@@ -110,14 +111,35 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_USER);
         db.execSQL(CREATE_TABLE_COUNTRY);
         db.execSQL(CREATE_TABLE_TRAVEL);
-        db.execSQL(CREATE_TABLE_TRAVEL_COUNTRY);
+        db.execSQL(CREATE_TABLE_USER_COUNTRY);
 
         /* Create new tables */
         onCreate(db);
     }
 
 
+    /* METHODS FOR ACCESSING THE TABLE USER_TRAVEL */
 
+    /* Create a UserCountry to show which countries user has been to */
+    public void createVisitedCountry(DBUser user, DBCountry country) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_ID,      user.getUserID());
+        values.put(KEY_COUNTRY_NAME, country.getCountry());
+
+        /* Insert row */
+        db.insert(TABLE_USER_COUNTRY, null, values);
+        db.close();
+    }
+
+    /* Delete a UserCountry */
+    public void deleteVisitedCountry(DBUser user, DBCountry country) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_USER_COUNTRY, KEY_USER_ID + " = ? AND " + KEY_COUNTRY_NAME + " = ?",
+                  new String[]{String.valueOf(user.getUserID()), String.valueOf(country.getCountry())});
+        db.close();
+    }
 
 
     /* METHODS FOR ACCESSING THE TABLE USER */
@@ -272,7 +294,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.putNull(KEY_TRAVEL_WALLPAPER);
 
         db.update(TABLE_TRAVEL, values, KEY_TRAVEL_ID + " = ?",
-                  new String[] {String.valueOf(travel.getTravelID())});
+                  new String[]{String.valueOf(travel.getTravelID())});
     }
 
 
@@ -291,7 +313,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
         values.put(KEY_TRAVEL_YEAR,      travel.getYear());
         values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
-        values.put(KEY_TRAVEL_DAY,       travel.getDay());
+        values.put(KEY_TRAVEL_DAY, travel.getDay());
         values.put(KEY_TRAVEL_WALLPAPER, travel.getPicturePath());
 
         db.update(TABLE_TRAVEL, values, KEY_TRAVEL_ID + " = " + travel.getTravelID(), null);
@@ -399,7 +421,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         t.setTitle   (c.getString(c.getColumnIndex(KEY_TRAVEL_TITLE)));
         t.setYear    (c.getInt   (c.getColumnIndex(KEY_TRAVEL_YEAR)));
         t.setMonth   (c.getInt   (c.getColumnIndex(KEY_TRAVEL_MONTH)));
-        t.setDay     (c.getInt   (c.getColumnIndex(KEY_TRAVEL_DAY)));
+        t.setDay(c.getInt(c.getColumnIndex(KEY_TRAVEL_DAY)));
 
         /* Control if the user choose own image as a wallpaper */
         String path = c.getString(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
@@ -417,44 +439,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* METHODS FOR ACCESSING THE TABLE COUNTRY */
 
-    /* Get the involved countries in the travel */
-    public List<DBCountry> getCountries(int travelID) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        List<DBCountry> countries = new ArrayList<>();
-
-        String selectQuery = ("SELECT " + KEY_COUNTRY_NAME     + " "
-                           +  "FROM "   + TABLE_COUNTRY        + "," + TABLE_TRAVEL_COUNTRY   + "," + TABLE_TRAVEL   + " "
-                           +  "WHERE "  + TABLE_TRAVEL_COUNTRY + "." + KEY_TRAVEL_ID    + "=" + TABLE_TRAVEL + "." + KEY_TRAVEL_ID
-                           +  "AND "    + TABLE_TRAVEL_COUNTRY + "." + KEY_COUNTRY_NAME + "=" + TABLE_COUNTRY + "." + KEY_COUNTRY_NAME
-                + "AND "    + TABLE_TRAVEL         + "." + KEY_TRAVEL_ID + "=" + travelID);
-
-        Log.e(LOG, selectQuery);
-
-        Cursor c = db.rawQuery(selectQuery, null);
-
-        /* Looping through all rows and adding to list */
-        if (c.moveToFirst()) {
-            do {
-                DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
-                countries.add(country);
-            }
-            while (c.moveToNext());
-        }
-
-        c.close();
-        db.close();
-        return countries;
-    }
-
     /* Get/list all countries in Africa */
     public List<DBCountry> getAllCountriesAfrica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
-                           +  "FROM "     + TABLE_COUNTRY         + ", "
+                           +  "FROM "     + TABLE_COUNTRY         + " "
                            +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
                            +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
@@ -466,8 +457,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -483,10 +474,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
-        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                +  "FROM "     + TABLE_COUNTRY        + ", "
-                + "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
-                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
+                           +  "FROM "     + TABLE_COUNTRY         + " "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Asia' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
 
@@ -496,8 +487,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -513,10 +504,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
-        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                +  "FROM "     + TABLE_COUNTRY        + ", "
-                + "WHERE " + KEY_COUNTRY_CONTINENT + "= 'Europe' "
-                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
+                           +  "FROM "     + TABLE_COUNTRY         + " "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Europe' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
 
@@ -526,8 +517,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -543,10 +534,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
-        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                +  "FROM "     + TABLE_COUNTRY        + ", "
-                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'North America' "
-                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
+                           +  "FROM "     + TABLE_COUNTRY         + " "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'North America' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
 
@@ -556,8 +547,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -573,10 +564,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
-        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                +  "FROM "     + TABLE_COUNTRY        + ", "
-                + "WHERE " + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
-                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
+                           +  "FROM "     + TABLE_COUNTRY         + " "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Oceania' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
 
@@ -586,8 +577,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -603,10 +594,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
 
-        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME     + " "
-                +  "FROM "     + TABLE_COUNTRY        + ", "
-                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'South America' "
-                +  "ORDER BY " + KEY_COUNTRY_NAME + " ASC");
+        String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
+                           +  "FROM "     + TABLE_COUNTRY         + " "
+                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'South America' "
+                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
 
@@ -616,8 +607,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent((c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT))));
+                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
                 countries.add(country);
             }
             while (c.moveToNext());

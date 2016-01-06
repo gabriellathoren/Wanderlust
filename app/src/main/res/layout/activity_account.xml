@@ -16,4 +16,128 @@
         layout="@layout/tool_bar">
     </include>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tool_bar"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/worldMap"
+            android:layout_width="fill_parent"
+            android:layout_height="220dp"
+            android:src="@drawable/world_map3"
+            android:scaleType="centerCrop"
+            android:alpha="0.5"/>
+
+        <TextView
+            android:id="@+id/total_countries"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="#000"
+            android:text="32"
+            android:textSize="100sp"
+            android:gravity="center"
+            android:alpha="0.4"
+            android:layout_marginTop="38dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/countries_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="#000"
+            android:text="@string/visited_countries"
+            android:textSize="30sp"
+            android:gravity="center"
+            android:alpha="0.4"
+            android:layout_above="@+id/linear_country_layout"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="47dp"
+            android:layout_alignParentEnd="true"
+            android:paddingTop="10dp"
+            android:layout_marginTop="10dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/linear_country_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_below="@+id/worldMap">
+
+            <TextView
+                android:id="@+id/africa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/africa" />
+
+            <ListView
+                android:id="@+id/list_view_africa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/asia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/asia" />
+
+            <ListView
+                android:id="@+id/list_view_asia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/europe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/europe" />
+
+            <ListView
+                android:id="@+id/list_view_europe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/north_america"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/north_america" />
+
+            <ListView
+                android:id="@+id/list_view_north_america"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/oceania"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/oceania" />
+
+            <ListView
+                android:id="@+id/list_view_oceania"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/south_america"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/south_america" />
+
+            <ListView
+                android:id="@+id/list_view_south_america"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 </RelativeLayout>

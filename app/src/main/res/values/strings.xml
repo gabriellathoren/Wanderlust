@@ -29,5 +29,15 @@
 
     <!-- Strings for TravelPage -->
     <string name="remove_title">Delete</string>
+    
+    <!-- Strings for Account --> 
+    <string name="visited_countries">visited countries</string>
+    <string name="africa">Africa</string>
+    <string name="asia">Asia</string>
+    <string name="europe">Europe</string>
+    <string name="north_america">North America</string>
+    <string name="oceania">Oceania</string>
+    <string name="south_america">South America</string>
+
 
 </resources>

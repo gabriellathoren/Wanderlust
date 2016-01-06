@@ -88,7 +88,6 @@ public class TravelPage extends AppCompatActivity {
                 delete();
             }
         });
-        
 
         /* Change the settings button in toolbar to an OK-button which the user clicks on when
          * done with their input for updating travel.

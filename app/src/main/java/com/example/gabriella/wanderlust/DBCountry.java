@@ -10,6 +10,7 @@ public class DBCountry {
 
     private String country;
     private String continent;
+    private boolean selected = false;
 
 
     /* Constructors */
@@ -30,6 +31,10 @@ public class DBCountry {
         this.continent = continent;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
 
     /* Getters */
     public String getCountry() {
@@ -39,5 +44,10 @@ public class DBCountry {
     public String getContinent() {
         return this.continent;
     }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
 
 }

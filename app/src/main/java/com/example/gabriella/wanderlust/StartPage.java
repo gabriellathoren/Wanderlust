@@ -43,6 +43,7 @@ public class StartPage extends AppCompatActivity {
     private final static String LOG_TAG = StartPage.class.getSimpleName();
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
