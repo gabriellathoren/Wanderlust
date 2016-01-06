@@ -1,5 +1,6 @@
 package com.example.gabriella.wanderlust;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -60,6 +61,12 @@ public class AccountActivity extends AppCompatActivity {
         /* Change the icon for user account to settings */
         settings = (ImageButton)findViewById(R.id.settings);
         settings.setBackgroundResource(R.drawable.ic_settings_white_24dp);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settings();
+            }
+        });
 
         /* Set total of visited countries */
         total = (TextView) findViewById(R.id.total_countries);
@@ -223,6 +230,12 @@ public class AccountActivity extends AppCompatActivity {
     }
 
 
+    /* Method for start settings activity */
+    public void settings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
+    }
 
     @Override
     protected void onStart() {

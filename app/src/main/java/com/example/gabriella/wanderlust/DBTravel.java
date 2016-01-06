@@ -146,7 +146,7 @@ public class DBTravel implements Serializable {
             wallpaperBM = this.wallpaper;
         }
 
-        final int maxSize = 500;
+        final int maxSize = 800;
 
         /* Get width and height of wallpaper */
         int width  = wallpaperBM.getWidth();

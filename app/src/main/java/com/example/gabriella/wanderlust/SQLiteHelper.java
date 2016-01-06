@@ -192,7 +192,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public void deleteVisitedCountry(DBUser user, DBCountry country) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER_COUNTRY, KEY_USER_ID + " = ? AND " + KEY_COUNTRY_NAME + " = ?",
-                  new String[]{String.valueOf(user.getUserID()), String.valueOf(country.getCountry())});
+                new String[]{String.valueOf(user.getUserID()), String.valueOf(country.getCountry())});
+        db.close();
+    }
+
+    /* Delete all the users visited countries */
+    public void deleteAllVisitedCountries(DBUser user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_USER_COUNTRY, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
         db.close();
     }
 
@@ -208,18 +215,23 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_USERNAME,   user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME,  user.getLastName());
+        values.put(KEY_USER_LAST_NAME, user.getLastName());
 
         /* Insert row */
         db.insert(TABLE_USER, null, values);
         db.close();
     }
 
+
     /* Delete a user */
-    public void deleteUser(long user_id) {
+    public void deleteUser(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(user_id)});
+        db.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
         db.close();
+
+        /* Delete everything in database associated with the user */
+        deleteAllTravels(user);
+        deleteAllVisitedCountries(user);
     }
 
 
@@ -349,7 +361,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.putNull(KEY_TRAVEL_WALLPAPER);
 
         db.update(TABLE_TRAVEL, values, KEY_TRAVEL_ID + " = ?",
-                  new String[]{String.valueOf(travel.getTravelID())});
+                new String[]{String.valueOf(travel.getTravelID())});
     }
 
 
@@ -357,6 +369,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public void deleteTravel(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travel.getTravelID())});
+        db.close();
+    }
+
+    public void deleteAllTravels(DBUser user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TRAVEL, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
         db.close();
     }
 

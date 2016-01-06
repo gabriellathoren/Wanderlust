@@ -118,7 +118,6 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
             title      = (TextView) itemView.findViewById(R.id.title);
             days       = (TextView) itemView.findViewById(R.id.days);
             background = (ImageView)itemView.findViewById(R.id.background);
-            background.setImageAlpha(100); // Opacity of background
         }
     }
 

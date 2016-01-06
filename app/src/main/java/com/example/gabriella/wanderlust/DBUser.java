@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public class DBUser implements Serializable {
 
-    int userID; /* Behövs den här verkligen? */
+    int userID;
     String username;
     String password;
     String first_name;
@@ -22,6 +22,14 @@ public class DBUser implements Serializable {
     public DBUser(){}
 
     public DBUser(String username, String password, String first_name, String last_name) {
+        this.username   = username;
+        this.password   = password;
+        this.first_name = first_name;
+        this.last_name  = last_name;
+    }
+
+    public DBUser(int id, String username, String password, String first_name, String last_name) {
+        this.userID     = id;
         this.username   = username;
         this.password   = password;
         this.first_name = first_name;
