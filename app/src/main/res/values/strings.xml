@@ -39,5 +39,13 @@
     <string name="oceania">Oceania</string>
     <string name="south_america">South America</string>
 
+    <!-- Strings for Settings -->
+    <string name="edit_profile">Edit profile</string>
+    <string name="change_password">Change password</string>
+    <string name="inactivate_account">Inactivate account</string>
+    <string name="old_password">old password</string>
+    <string name="new_password">new password</string>
+    <string name="log_out">LOG OUT</string>
+
 
 </resources>

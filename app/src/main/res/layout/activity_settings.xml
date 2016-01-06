@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Layout for settings activity -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SettingsActivity"
+    android:id="@+id/settingsLayout">
+
+    <!-- Includes the toolbar in the activity -->
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/tool_bar">
+    </include>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/tool_bar"
+        android:padding="10dp"
+        android:layout_above="@+id/log_out">
+
+        <TextView
+            android:id="@+id/editProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_profile"
+            android:layout_marginTop="26dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:textSize="25sp"
+            android:layout_marginBottom="10dp"
+            android:drawableStart="@drawable/ic_person_black_24dp"/>
+
+        <EditText
+            android:id="@+id/first_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="@string/reg_first_name"
+            android:ems="10"
+            android:layout_below="@+id/editProfile"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:padding="10dp"/>
+
+        <EditText
+            android:id="@+id/sir_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:hint="@string/reg_sir_name"
+            android:ems="10"
+            android:padding="10dp"
+            android:layout_below="@+id/first_name"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:hint="@string/login_username_text"
+            android:ems="10"
+            android:layout_below="@+id/sir_name"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:padding="10dp"/>
+
+        <TextView
+            android:id="@+id/change_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change_password"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/username"
+            android:textSize="25sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:drawableStart="@drawable/ic_https_black_24dp"/>
+
+        <ImageButton
+            android:id="@+id/inactivate_account"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:drawableStart="@drawable/ic_delete_black_24dp"
+            android:layout_below="@+id/change_password" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/log_out"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="@string/log_out"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:padding="0dp"
+        android:layout_margin="0dp"
+        android:textColor="@android:color/white"
+        android:fontFamily="Arial"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:background="@drawable/delete_color"
+        />
+
+
+</RelativeLayout>

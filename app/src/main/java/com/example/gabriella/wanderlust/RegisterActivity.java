@@ -158,12 +158,31 @@ public class RegisterActivity extends AppCompatActivity {
             DBUser user = new DBUser(username, password, firstname, lastname);
             db.createUser(user);
 
-            /* Go back to MainActivity */
-            Intent intent = new Intent(context, MainActivity.class);
-            startActivity(intent);
+            /* AlertDialog to be sure that user wants to delete the travel */
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-            /* Finish to not be able to go back */
-            finish();
+            alertDialogBuilder.setTitle("Welcome to Wanderlust");
+            alertDialogBuilder
+                    .setMessage("You are now registered")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+
+                            /* Go back to MainActivity */
+                            Intent intent = new Intent(context, MainActivity.class);
+                            startActivity(intent);
+
+                            /* Finish to not be able to go back */
+                            RegisterActivity.this.finish();
+
+                        }
+                    });
+
+            /* create alert dialog and show it */
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+
         }
     }
 

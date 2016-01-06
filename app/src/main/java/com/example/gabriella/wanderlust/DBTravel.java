@@ -146,7 +146,7 @@ public class DBTravel implements Serializable {
             wallpaperBM = this.wallpaper;
         }
 
-        final int maxSize = 3000;
+        final int maxSize = 500;
 
         /* Get width and height of wallpaper */
         int width  = wallpaperBM.getWidth();
@@ -169,50 +169,5 @@ public class DBTravel implements Serializable {
 
         return this.wallpaper;
     }
-
-    /* To store image in database the image must be saved as byte[], therefore the method
-     * getWallpaperAsByte() converts the bitmap-image to byte[]
-    public byte[] getWallpaperAsByte() {
-
-        if (wallpaper == null) {
-            return null;
-        }
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        wallpaper.compress(Bitmap.CompressFormat.JPEG, 0, outputStream);
-
-        return outputStream.toByteArray();
-    }
-
-*/
-
-
-    /* Returns a scaled Bitmap, which is needed to display a too big of an image in ImageView, the
-     * maxsize is the possible maxsize of the image to be shown in the ImageView.
-
-    public void setWallpaper(Bitmap wallpaper) {
-        final int maxSize = 3000;
-
-        /* Get width and height of wallpaper
-        int width  = wallpaper.getWidth();
-        int height = wallpaper.getHeight();
-
-        /* Set new width or height depending on if the picture is horizontal or vertical
-        float bitmapRatio = (float)width / (float) height;
-        if (bitmapRatio > 1) {
-            width  = maxSize;
-            height = (int) (width / bitmapRatio);
-            Log.d(LOG_TAG, "width: " + width + " height: " + height);
-        }
-        else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
-            Log.d(LOG_TAG, "width: " + width + " height: " + height);
-        }
-
-        this.wallpaper = Bitmap.createScaledBitmap(wallpaper, width, height, true);
-    }
-*/
-
 
 }

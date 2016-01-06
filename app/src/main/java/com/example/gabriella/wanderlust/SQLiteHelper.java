@@ -45,7 +45,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_LAST_NAME  = "last_name";
 
     /* Country table - column names */
-    private static final String KEY_COUNTRY_NAME      = "country";
+    private static final String KEY_COUNTRY_NAME      = "country_name";
     private static final String KEY_COUNTRY_CONTINENT = "continent";
 
     /* Travel table - column names */
@@ -119,6 +119,61 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
 
     /* METHODS FOR ACCESSING THE TABLE USER_TRAVEL */
+
+    /* Total of countries the user has been to */
+    public int getTotalVisitedCountries(DBUser user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selectQuery = "SELECT count(*) FROM " + TABLE_USER_COUNTRY + " "
+                           + "WHERE " + KEY_USER_ID + " = " + user.getUserID();
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+
+        if (c != null) {
+            c.moveToFirst();
+        }
+
+        int total = c.getInt(0);
+
+        db.close();
+        c.close();
+
+        return total;
+
+    }
+
+    /* Get the whole list of the countries the user has been to */
+    public List<DBCountry> getVisitedCountries(DBUser user) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<DBCountry> countries = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + TABLE_USER_COUNTRY + " "
+                           + "WHERE " + KEY_USER_ID + " = " + user.getUserID();
+
+        Log.e(LOG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        /* Looping through all rows and adding to list */
+        if (c.moveToFirst()) {
+            do {
+                DBCountry country = new DBCountry();
+                country.setCountry (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
+                country.setSelected(true);
+                countries.add(country);
+            }
+            while (c.moveToNext());
+        }
+
+        c.close();
+        db.close();
+
+        return countries;
+    }
 
     /* Create a UserCountry to show which countries user has been to */
     public void createVisitedCountry(DBUser user, DBCountry country) {
@@ -201,10 +256,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         DBUser u = new DBUser();
         u.setUserID   (c.getInt   (c.getColumnIndex(KEY_USER_ID)));
-        u.setUsername(c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
-        u.setPassword(c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
+        u.setUsername (c.getString(c.getColumnIndex(KEY_USER_USERNAME)));
+        u.setPassword (c.getString(c.getColumnIndex(KEY_USER_PASSWORD)));
         u.setFirstName(c.getString(c.getColumnIndex(KEY_USER_FIRST_NAME)));
-        u.setLastName(c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
+        u.setLastName (c.getString(c.getColumnIndex(KEY_USER_LAST_NAME)));
 
         c.close();
         db.close();
@@ -457,8 +512,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -466,6 +520,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         c.close();
         db.close();
+
         return countries;
     }
 
@@ -487,8 +542,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -517,8 +571,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -547,8 +600,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -577,8 +629,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -607,8 +658,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
-                country.setCountry  (c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
-                country.setContinent(c.getString(c.getColumnIndex(KEY_COUNTRY_CONTINENT)));
+                country.setCountry(c.getString(c.getColumnIndex(KEY_COUNTRY_NAME)));
                 countries.add(country);
             }
             while (c.moveToNext());
@@ -621,17 +671,25 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* Create a country */
     public void createCountry(DBCountry country) {
-        SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_COUNTRY_NAME,      country.getCountry());
-        values.put(KEY_COUNTRY_CONTINENT, country.getContinent());
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
 
-        /* Insert row */
-        db.insert(TABLE_COUNTRY, null, values);
-        db.close();
+            ContentValues values = new ContentValues();
+            values.put(KEY_COUNTRY_NAME, country.getCountry());
+            values.put(KEY_COUNTRY_CONTINENT, country.getContinent());
 
-        Log.v("MyActivity","createCountry (" + country.getCountry() + "," + country.getContinent() + ")");
+            /* Insert row with constraint so it only stores the countries if it does not already
+             * exists in database.
+             */
+            db.insertWithOnConflict(TABLE_COUNTRY, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+
+            /* Close database */
+            db.close();
+        }
+        catch (Exception e) {
+
+        }
     }
 
 
@@ -661,7 +719,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         createCountry(country);
         country = new DBCountry("Congo", "Africa");
         createCountry(country);
-        country = new DBCountry("Congo, Democratic Republic of", "Africa");
+        country = new DBCountry("Democratic Republic of Congo", "Africa");
         createCountry(country);
         country = new DBCountry("Djibouti", "Africa");
         createCountry(country);

@@ -140,12 +140,36 @@ public class TravelPage extends AppCompatActivity {
     }
 
     public void delete() {
-        db.deleteTravel(travel);
 
-        /* Go back to the StartPage when the new travel has been stored in the database */
-        Intent intent = new Intent(this, StartPage.class);
-        intent.putExtra("user", user);
-        startActivity(intent);
+        /* AlertDialog to be sure that user wants to delete the travel */
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setTitle("Remove travel");
+        alertDialogBuilder
+                .setMessage("Are you sure you want to delete this travel?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+
+                        db.deleteTravel(travel);
+
+                        /* Go back to the StartPage when the new travel has been stored in the database */
+                        Intent intent = new Intent(TravelPage.this, StartPage.class);
+                        intent.putExtra("user", user);
+                        startActivity(intent);
+
+                        TravelPage.this.finish();
+                    }
+                })
+                .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        /* create alert dialog and show it */
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     public void removeImage() {

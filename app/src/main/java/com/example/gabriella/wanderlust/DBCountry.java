@@ -27,10 +27,6 @@ public class DBCountry {
         this.country = country;
     }
 
-    public void setContinent(String continent) {
-        this.continent = continent;
-    }
-
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
