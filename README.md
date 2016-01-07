@@ -12,5 +12,6 @@ The application is fairly easy with a start page that lists all travels. The use
 In the user profile the user can select countries via checkboxes to get a calculation of the total amount of countries where he or she has travelled. The user can also continue from here to change the user information, log out from the application or delete the account. 
 
 ## Requirements
-All the user need to use the application is a smart phone. Everything else is included in the application. 
+All the user need to use the application is a smart phone. The user must also register an account to become an member and be able to use the application. The registration is done on the first activity (log in) of the application. 
 
+Everything else is included in the application. 
