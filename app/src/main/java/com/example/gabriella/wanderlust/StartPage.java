@@ -1,13 +1,8 @@
-/**
- * Created by Gabriella on 2015-11-30.
- */
-
 package com.example.gabriella.wanderlust;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,18 +12,29 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.ImageButton;
 
-import java.util.ArrayList;
-
 import java.util.List;
+
+/**
+ *  <h1>StartPage</h1>
+ *
+ *  This class handles the start page of the application which displays a list of travels that
+ *  the user has created. This class contains the whole layout for the travels that is listed in a
+ *  CardView and RecyclerView and is connected to an adapter which fills the rows with the
+ *  correct data and row layout.
+ *
+ *
+ *  @author     Gabriella Thorén
+ *  @version    1
+ */
 
 
 public class StartPage extends AppCompatActivity {
 
     /* Layout components */
-    private List<DBTravel> travels;
-    private RecyclerView   rv;
-    private RVAdapter      ra;
-    private ImageButton    account;
+    List<DBTravel> travels;
+    RecyclerView   rv;
+    RVAdapter      ra;
+    ImageButton    account;
 
     /* Current user */
     DBUser user;
@@ -80,35 +86,53 @@ public class StartPage extends AppCompatActivity {
 
     }
 
-    /* Start activity for account */
+    /**
+     *  This method is called when the user pressed the account button and starts the activity for
+     *  showing the user her/his personal account.
+     *
+     *  @see AccountActivity
+     *  @see DBUser
+     */
     public void account() {
         Intent intent = new Intent(this, AccountActivity.class);
         intent.putExtra("user", user);
         startActivity(intent);
     }
 
-    /* Sets view to AddActivity when user presses the Floating Action Button for adding travels */
+    /**
+     *  Sets view to AddActivity when user presses the Floating Action Button for adding travels.
+     *
+     *  @see AddActivity
+     *  @see DBUser
+     */
     public void addHandler(View v) {
         Intent intent = new Intent(this, AddActivity.class);
         intent.putExtra("user", user);
         startActivity(intent);
     }
 
-
+    /**
+     * This menu initiating the menu's xml-file.
+     *
+     * @param  menu     the menu in java code
+     * @return Boolean  returns <code>true</code> if the menu is initiated
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        /* Adds items to the actionbar if it is present */
+        /* Adds items to the actionbar */
         getMenuInflater().inflate(R.menu.my, menu);
         return true;
     }
 
-    /* Method is called when an item in the action bar is selected. */
+    /**
+     *  Method is called when an item is selected and returns the selected option.
+     *
+     *  @param  item     the item that has gotten selected
+     *  @return Boolean  returns <code>true</code> if the specific option is selected
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 

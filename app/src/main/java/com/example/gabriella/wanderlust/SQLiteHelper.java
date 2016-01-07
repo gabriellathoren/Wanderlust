@@ -424,7 +424,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* METHODS FOR ACCESSING THE TABLE TRAVEL */
 
-    /** Create a travel */
+    /**
+     *  Creates a row in the travel table with the given information about the travel and which
+     *  user that has created it.
+     *
+     *  @param user     the user which created the travel
+     *  @param travel   the new travel
+     */
     public void createTravel(DBTravel travel, DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -442,7 +448,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /* Delete wallpaper */
+    /**
+     *  Deletes the value of the stored wallpaper with the given information about the travel which
+     *  has the wallpaper.
+     *
+     *  @param travel   the travel which contains the wallpaper
+     */
     public void deleteWallpaper(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -454,20 +465,33 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
 
-    /* Delete travel */
+    /**
+     * Deletes a row from the travel table (a travel).
+     *
+     * @param travel    the travel which is going to be deleted
+     */
     public void deleteTravel(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRAVEL, KEY_TRAVEL_ID + " = ?", new String[]{String.valueOf(travel.getTravelID())});
         db.close();
     }
 
+    /**
+     * Deletes all travels which a user has created.
+     *
+     * @param user  the user of the travels which is going to be deleted.
+     */
     public void deleteAllTravels(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_TRAVEL, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
         db.close();
     }
 
-    /* Update travel information */
+    /**
+     * Updates travel information.
+     *
+     * @param travel    the travel with the new information, but still contains the old travel id
+     */
     public void updateTravel(DBTravel travel) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -483,9 +507,17 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /* List all the user's travels */
+    /**
+     * Lists all the user's travels. If the user has not set an own wallpaper, this method gives the
+     * list object a default one.
+     *
+     * @param     user      the relevant user
+     * @param     context   the activity contaxt
+     * @see       DBUser
+     * @exception Exception
+     *
+     */
     public List<DBTravel> getTravels(DBUser user, Context context) {
-        Log.d(LOG, "SQLiteHelper.getTravels()");
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBTravel> travels = new ArrayList<>();
 
@@ -519,6 +551,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     else {
                         BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inScaled = false;
+
+                        /*
+                         * There is three different default wallpapers which is alternated. The
+                         * switch statement checks the state of the variable wallpaperColor to see
+                         * which color the previous list object had. By doing that the first object
+                         * gets the backg1 as a wallpaper, the second gets backg2, the third one gets
+                         * backg3, the fourth backg1 etc.
+                         */
                         switch (wallpaperColor) {
 
                             case 1:
@@ -557,11 +597,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
 
-    /* Get a single travel by giving the position of the travel to search for */
+    /**
+     * Get data from database about a specific travel.
+     *
+     * @param travelID  the travelID of the wanted travel
+     * @param user      the user which created the travel
+     */
     public DBTravel getTravel(int travelID, DBUser user) {
         SQLiteDatabase db = this.getReadableDatabase();
-
-        DBTravel travel = new DBTravel();
 
         String selectQuery = ("SELECT * FROM " + TABLE_TRAVEL + "," + TABLE_USER + " "
                            +  "WHERE "    + TABLE_TRAVEL  + "." + KEY_USER_ID       + " = "    + TABLE_USER + "." + KEY_USER_ID + " "
@@ -570,22 +613,24 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                            +  "ORDER BY " + TABLE_TRAVEL  + "." + KEY_TRAVEL_YEAR   + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_MONTH + " ASC, " + TABLE_TRAVEL + "." + KEY_TRAVEL_DAY + " ASC");
 
         Log.e(LOG, selectQuery);
-
-
         Cursor c = db.rawQuery(selectQuery, null);
 
         if (c != null) {
             c.moveToFirst();
         }
 
+        /* Get data from the database an create a DBTravel object. */
         DBTravel t = new DBTravel();
         t.setTravelID(c.getInt   (c.getColumnIndex(KEY_TRAVEL_ID)));
         t.setTitle   (c.getString(c.getColumnIndex(KEY_TRAVEL_TITLE)));
         t.setYear    (c.getInt   (c.getColumnIndex(KEY_TRAVEL_YEAR)));
         t.setMonth   (c.getInt   (c.getColumnIndex(KEY_TRAVEL_MONTH)));
-        t.setDay(c.getInt(c.getColumnIndex(KEY_TRAVEL_DAY)));
+        t.setDay     (c.getInt   (c.getColumnIndex(KEY_TRAVEL_DAY)));
 
-        /* Control if the user choose own image as a wallpaper */
+        /*
+         * Control if the user choose own image as a wallpaper, if it has, the wallpaper of the
+         * DBTravel object till be set. Otherwice the object do not get a wallpaper.
+         */
         String path = c.getString(c.getColumnIndex(KEY_TRAVEL_WALLPAPER));
         if (path != null) {
             t.setWallpaper(path);
@@ -601,7 +646,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* METHODS FOR ACCESSING THE TABLE COUNTRY */
 
-    /* Get/list all countries in Africa */
+    /**
+     * Creates a list of all countries in Africa.
+     *
+     * @return List<DBCountry>
+     * @see    DBCountry
+     */
     public List<DBCountry> getAllCountriesAfrica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -612,7 +662,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                            +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
-
         Cursor c = db.rawQuery(selectQuery, null);
 
         /* Looping through all rows and adding to list */
@@ -631,7 +680,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Get/list all countries in Asia */
+    /**
+     *  Creates a list of all countries in Asia
+     *
+     *  @return List<DBCountry>
+     *  @see    DBCountry
+     */
     public List<DBCountry> getAllCountriesAsia() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -642,10 +696,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                            +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
-
         Cursor c = db.rawQuery(selectQuery, null);
 
-        /* Looping through all rows and adding to list */
+        /* Looping through all rows and adding it to list */
         if (c.moveToFirst()) {
             do {
                 DBCountry country = new DBCountry();
@@ -660,7 +713,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Get/list all countries in Europe */
+    /**
+     * Creates a list of all countries in Europe.
+     *
+     * @return List<DBCountry>
+     * @see    DBCountry
+     */
     public List<DBCountry> getAllCountriesEurope() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -689,7 +747,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Get/list all countries in North America */
+    /**
+     * Creates a list of all countries in North America.
+     *
+     * @return List<DBCountry>
+     * @see    DBCountry
+     */
     public List<DBCountry> getAllCountriesNorthAmerica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -718,7 +781,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Get/list all countries in Oceania */
+    /**
+     * Cretes a list of all countries in Oceania.
+     *
+     * @return List<DBCountry>
+     * @see    DBCountry
+     */
     public List<DBCountry> getAllCountriesOceania() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -747,7 +815,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Get/list all countries in South America */
+    /**
+     * Creates a list of all countries in South America.
+     *
+     * @return List<DBCountry>
+     * @see    DBCountry
+     */
     public List<DBCountry> getAllCountriesSouthAmerica() {
         SQLiteDatabase db = this.getReadableDatabase();
         List<DBCountry> countries = new ArrayList<>();
@@ -776,7 +849,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Create a country */
+    /**
+     * Creates a row in the table country.
+     *
+     * @param     country   the new country
+     * @exception Exception
+     */
     public void createCountry(DBCountry country) {
 
         try {
@@ -786,8 +864,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             values.put(KEY_COUNTRY_NAME, country.getCountry());
             values.put(KEY_COUNTRY_CONTINENT, country.getContinent());
 
-            /* Insert row with constraint so it only stores the countries if it does not already
-             * exists in database.
+            /*
+             * Insert row with constraint so it only stores the countries if it does not already
+             * exists in database. Otherwice the application must call on these method only once. In
+             * this way the application can call on these method every time.
              */
             db.insertWithOnConflict(TABLE_COUNTRY, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
@@ -795,12 +875,18 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             db.close();
         }
         catch (Exception e) {
-
+            e.getStackTrace();
         }
     }
 
 
-    /* Add all countries of the world to table */
+    /**
+     *  Creates DBCountry objects of all countries in the world and calls on the method
+     *  createCountry(DBCountry) which stores the information in the database.
+     *
+     *  @see DBCountry
+     *  @see #createCountry(DBCountry)
+     */
     public void setCountries() {
         DBCountry country = new DBCountry("Algeria", "Africa");
         createCountry(country);

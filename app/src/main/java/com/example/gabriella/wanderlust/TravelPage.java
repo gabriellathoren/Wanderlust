@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,14 +17,20 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import java.util.Calendar;
-import java.util.Date;
 
 /**
- * Created by Gabriella on 2015-12-18.
+ * <h1>TravelPage</h1>
+ *
+ * This class shows a specific travel item from the list of travel and is used when the user has
+ * chosen to see information about a travel. The user has an opportunity to change the information
+ * or delete the travel.
+ *
+ * @author  Gabriella Thorén
+ * @version 1
+ *
  */
+
 public class TravelPage extends AppCompatActivity {
 
     /* For logging */
@@ -73,7 +78,7 @@ public class TravelPage extends AppCompatActivity {
         /* Reuse the layout for adding new travels */
         setContentView(R.layout.activity_add);
 
-        /* Initialize components with the related xml-components */
+        /* Initiate components with the related xml-components */
         datePicker  = (DatePicker) findViewById(R.id.travel_date_picker);
         travelTitle = (EditText)   findViewById(R.id.travel_title);
         wallpaper   = (ImageView)  findViewById(R.id.backgroundSetter);
@@ -89,7 +94,8 @@ public class TravelPage extends AppCompatActivity {
             }
         });
 
-        /* Change the settings button in toolbar to an OK-button which the user clicks on when
+        /*
+         * Change the settings button in toolbar to an OK-button which the user clicks on when
          * done with their input for updating travel.
          */
         saveButton = (ImageButton)findViewById(R.id.settings);
@@ -139,6 +145,17 @@ public class TravelPage extends AppCompatActivity {
         super.onStart();
     }
 
+    /**
+     * Method for deleting a specific travel item. This method is called when the user has pressed
+     * the delete button. It controls if the user is sure about the action, and if he/she is the
+     * travel is deleted and the user is taken back to the StartPage with the list of travels.
+     *
+     * @see DBTravel
+     * @see SQLiteHelper#deleteTravel(DBTravel)
+     * @see StartPage
+     *
+     *
+     */
     public void delete() {
 
         /* AlertDialog to be sure that user wants to delete the travel */
@@ -172,6 +189,14 @@ public class TravelPage extends AppCompatActivity {
         alertDialog.show();
     }
 
+    /**
+     * Method which removes the image that the user has picked as wallpaper. This method is called
+     * when the user has pressed the button for deleting wallpaper.
+     *
+     * @see DBTravel
+     * @see SQLiteHelper#deleteWallpaper(DBTravel)
+     *
+     */
     public void removeImage() {
         db.deleteWallpaper(travel);
 
@@ -183,42 +208,47 @@ public class TravelPage extends AppCompatActivity {
 
     }
 
+    /**
+     * Method which creates alert dialog pop ups for giving a message to the user.
+     *
+     * @param message   text with the message to the user
+     */
+    public void alert(String message) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle("Wrong input");
+        dlgAlert.setPositiveButton("Try again", null);
+        dlgAlert.setCancelable(false);
+        dlgAlert.create().show();
+
+        dlgAlert.setPositiveButton("Try again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+    }
+
+    /**
+     * Method for saving the travel. This method is called on when the user has pressed the save
+     * button.
+     *
+     * @see DBTravel
+     * @see StartPage
+     * @see SQLiteHelper#updateTravel(DBTravel)
+     */
     public void save() {
 
         /* Check if title is empty and alert user */
         if (travelTitle.getText().toString().matches("")) {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-
-            dlgAlert.setMessage("You did not write a title for this travel");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+            alert("You did not write a title for this travel");
         }
         /* Check if text is longer then 17 characters */
         else if (travelTitle.getText().toString().length() > 17) {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-
-            dlgAlert.setMessage("The title is too long, maximum number of characters is 17");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+            alert("The title is too long, maximum number of characters is 17");
         }
+        /* If the input is correct */
         else {
             DBTravel updatedTravel;
 
@@ -228,16 +258,15 @@ public class TravelPage extends AppCompatActivity {
             int month    = datePicker .getMonth();
             int day      = datePicker .getDayOfMonth();
 
-            /* Initialize travel */
+            /* Initiate travel */
             if (picturePath != null) {
                 /* If the user selected own image as wallpaper */
                 updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day, picturePath);
             }
             else {
-                /* If the user didn't select a image */
+                /* If the user didn't select an image */
                 updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day);
             }
-
 
             /* Insert the values in database */
             db.updateTravel(updatedTravel);
@@ -249,9 +278,13 @@ public class TravelPage extends AppCompatActivity {
         }
     }
 
-    /* OnClickHandler for the floating action button in activity_add so that the user can choose
-    * a wallpaper for the travel, otherwice there will be an standard picture.
-    */
+    /**
+     * OnClickHandler for the floating action button in add activity so that the user can choose
+     * a wallpaper for the travel, otherwice there will be a default picture. This method opens
+     * the user's image gallery and retrieves the chosen image.
+     *
+     * @param view  the layout
+     */
     public void wallpaperHandler(View view) {
 
         /* Initialize the ImageView with the related xml-component */
