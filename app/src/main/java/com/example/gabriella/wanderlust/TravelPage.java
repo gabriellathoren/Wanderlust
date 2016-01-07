@@ -343,8 +343,15 @@ public class TravelPage extends AppCompatActivity {
             /* Set ImageView to the new image */
             DBTravel t = new DBTravel();
             t.setWallpaper(picturePath);
-            wallpaperBM = t.getWallpaper(); // Must be done to get a resized Bitmap
-            wallpaper.setImageBitmap(wallpaperBM);
+
+            /* Catch if the file path is wrong and give an alert message to the user */
+            try {
+                wallpaperBM = t.getWallpaper(); // Must be done to get a resized Bitmap
+                wallpaper.setImageBitmap(wallpaperBM);
+            }
+            catch(Exception e) {
+                alert("There is something wrong with the filepath");
+            }
 
             /* Set visibility on remove image button if there are a image in ImageView */
             remove.setVisibility(View.VISIBLE);
