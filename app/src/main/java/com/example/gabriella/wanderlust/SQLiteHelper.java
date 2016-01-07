@@ -1,7 +1,20 @@
 package com.example.gabriella.wanderlust;
 
 /**
- * This class handles the database
+ * <h1>SQLiteHelper</h1>
+ *
+ * This class handles the database.
+ *
+ * There are four tables in the database:
+ * <ol>
+ *     <li>user which represents the users of the application</li>
+ *     <li>country which represents the countries of the world</li>
+ *     <li>travel which represents the user's travels</li>
+ *     <li>user_country which represents the places the user has traveled to</li>
+ * </ol>
+ *
+ * @author  Gabriella Thorén
+ * @version 1
  */
 
 import android.content.ContentValues;
@@ -88,12 +101,21 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
 
 
-    /* Constructor */
+    /**
+     * Constructor for the SQLiteHelper.
+     *
+     * @param context   the context of the relevant activity
+     */
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
 
+    /**
+     * Creates the database tables
+     *
+     * @param db    the database
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
 
@@ -105,6 +127,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Updates the tables in the database if the database changes
+     *
+     * @param db            the database
+     * @param oldVersion    the old version of the database
+     * @param newVersion    the new version of the database
+     */
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         /* Drop older tables while upgrading */
@@ -120,7 +149,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* METHODS FOR ACCESSING THE TABLE USER_TRAVEL */
 
-    /* Total of countries the user has been to */
+    /**
+     *  Method which returns the number of countries that the user has traveled to.
+     *
+     *  @param  user     the current user
+     *  @return int      the number of countries which the user has traveled to
+     */
     public int getTotalVisitedCountries(DBUser user) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -128,9 +162,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                            + "WHERE " + KEY_USER_ID + " = " + user.getUserID();
 
         Log.e(LOG, selectQuery);
-
         Cursor c = db.rawQuery(selectQuery, null);
-
 
         if (c != null) {
             c.moveToFirst();
@@ -145,7 +177,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    /* Get the whole list of the countries the user has been to */
+    /**
+     * Method which returns the whole list of the countries which the user has visited
+     *
+     * @param user              the user
+     * @return List<DBCountry>  a list of countries where the user has been
+     * @see    DBCountry
+     */
     public List<DBCountry> getVisitedCountries(DBUser user) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -175,7 +213,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return countries;
     }
 
-    /* Create a UserCountry to show which countries user has been to */
+    /**
+     *  Creates a row in the table user_country which shows the countries where the user has been by
+     *  adding the user id and the country name to the table.
+     *
+     *  @param user     the user
+     *  @param country  the country where the user has been
+     */
     public void createVisitedCountry(DBUser user, DBCountry country) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -188,7 +232,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /* Delete a UserCountry */
+    /**
+     * Deletes a row from the table user_country, which shows the countries where the user has been,
+     * by comparing the user id and the country name with the rows in the table.
+     *
+     * @param user    the user
+     * @param country the country
+     */
     public void deleteVisitedCountry(DBUser user, DBCountry country) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER_COUNTRY, KEY_USER_ID + " = ? AND " + KEY_COUNTRY_NAME + " = ?",
@@ -196,7 +246,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /* Delete all the users visited countries */
+    /**
+     * Deletes all the users visited countries, which is needed if the user is deleted from the
+     * database. The method finds the rows which contains the user id.
+     *
+     * @param user  the relevant user
+     */
     public void deleteAllVisitedCountries(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER_COUNTRY, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
@@ -206,8 +261,11 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* METHODS FOR ACCESSING THE TABLE USER */
 
-
-    /* Create a user */
+    /**
+     * Creates a user by adding information from an DBUser object to the database.
+     *
+     * @param user
+     */
     public void createUser(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -215,7 +273,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_USERNAME,   user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
+        values.put(KEY_USER_LAST_NAME,  user.getLastName());
 
         /* Insert row */
         db.insert(TABLE_USER, null, values);
@@ -223,7 +281,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
 
-    /* Delete a user */
+    /**
+     * Deletes a user by finding the row with the relevant user id. It is not enough to delete
+     * the user, therefore the associated travels and visited countries are deleted from the
+     * database.
+     *
+     * @param user  the relevant user
+     * @see   #deleteAllTravels(DBUser)
+     * @see   #deleteAllVisitedCountries(DBUser)
+     */
     public void deleteUser(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_USER, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
@@ -235,15 +301,19 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
 
-    /* Update user information */
+    /**
+     * Updates user information
+     *
+     * @param user      the relevant user
+     */
     public void updateUser(DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_USERNAME, user.getUsername());
-        values.put(KEY_USER_PASSWORD, user.getPassword());
+        values.put(KEY_USER_USERNAME,   user.getUsername());
+        values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME, user.getLastName());
+        values.put(KEY_USER_LAST_NAME,  user.getLastName());
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
 
@@ -251,7 +321,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    /* Get user information by username */
+    /**
+     * Returns user information by giving username as a parameter
+     *
+     * @param username      the user's username
+     * @see   DBUser
+     */
     public DBUser getUser(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -279,7 +354,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return u;
     }
 
-    /* Check if user exists */
+    /**
+     * Check if user exists by giving information about the user's username and the user's
+     * password.
+     *
+     * @param  username  the user's username
+     * @param  password  the user's password
+     * @return Boolean   <code>true</code> if the user exists
+     *                   <code>false</code> if the user does not exists
+     */
     public Boolean ifUserExists(String username, String password) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -306,7 +389,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    /* Check if user exists */
+    /**
+     *  Check if user exists by giving information about the user's username.
+     *
+     *  @param  username     the user to control
+     *  @return Boolean      <code>true</code> if the user exists
+     *                       <code>false</code> if the user does not exists
+     */
     public Boolean ifUserExists(String username) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -335,7 +424,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     /* METHODS FOR ACCESSING THE TABLE TRAVEL */
 
-    /* Create a travel */
+    /** Create a travel */
     public void createTravel(DBTravel travel, DBUser user) {
         SQLiteDatabase db = this.getWritableDatabase();
 

@@ -11,6 +11,8 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 /**
+ * <h1>RegisterActivity</h1>
+ *
  * Java class which handles user registrations.
  */
 public class RegisterActivity extends AppCompatActivity {
@@ -53,10 +55,17 @@ public class RegisterActivity extends AppCompatActivity {
         password2ET = (EditText)findViewById(R.id.reg_verify_password);
         firstNameET = (EditText)findViewById(R.id.reg_first_name);
         lastNameET  = (EditText)findViewById(R.id.reg_sir_name);
-
-
     }
 
+    /**
+     * Method which controls the user input and registers the user by store the information in the
+     * database.
+     *
+     * @param view      the layout
+     * @see   DBUser
+     * @see   SQLiteHelper#ifUserExists(String)
+     * @see   SQLiteHelper#createUser(DBUser)
+     */
     public void register(View view) {
 
         /* Get the user's text input */
@@ -68,89 +77,27 @@ public class RegisterActivity extends AppCompatActivity {
 
         /* Control if there are empty EditTexts */
         if (username.matches("") || password.matches("") || password2.matches("") || firstname.matches("") || lastname.matches("")) {
-
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-            dlgAlert.setMessage("Please fill in all text fields");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+            alert("Please fill in all text fields");
         }
 
         /* Control if user exists */
         else if (db.ifUserExists(username)){
-
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-            dlgAlert.setMessage("This e-mail is already registered");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+            alert("This e-mail is already registered");
         }
 
         /* Control if the password is correct to minimize the risks for wrong password input */
         else if(!password.matches(password2)) {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-            dlgAlert.setMessage("The password's does not match!");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+            alert("The password's does not match!");
         }
 
         /* If password isn't long enough */
         else if(password.length() < 8) {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-            dlgAlert.setMessage("The password is to short! Please select a password with minimum of 8 characters");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+            alert("The password is to short! Please select a password with minimum of 8 characters");
         }
 
         /* Control if username is an email by matching it with email pattern */
         else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(username).matches()) {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-            dlgAlert.setMessage("The e-mail is invalid!");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+            alert("The e-mail is invalid!");
         }
 
         /* If all input is accepted */
@@ -181,9 +128,28 @@ public class RegisterActivity extends AppCompatActivity {
             /* create alert dialog and show it */
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
-
-
         }
+    }
+
+    /**
+     * Method which alerts user with messengers via AlertDialog.
+     *
+     * @param message   message for the user
+     */
+    public void alert(String message) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
+
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle("Wrong input");
+        dlgAlert.setPositiveButton("Try again", null);
+        dlgAlert.setCancelable(false);
+        dlgAlert.create().show();
+
+        dlgAlert.setPositiveButton("Try again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
     }
 
     @Override

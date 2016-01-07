@@ -1,10 +1,5 @@
 package com.example.gabriella.wanderlust;
 
-import com.example.gabriella.wanderlust.SQLiteHelper;
-import com.example.gabriella.wanderlust.DBCountry;
-import com.example.gabriella.wanderlust.DBTravel;
-import com.example.gabriella.wanderlust.DBUser;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +12,15 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * <h1>MainActivity</h1>
+ *
+ * This class displays the first activity of the application, which is the log in activity. In this
+ * activity the user can log in on its account or register as an user.
+ *
+ * @author  Gabriella Thorén
+ * @version 1
+ */
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -80,11 +84,25 @@ public class MainActivity extends AppCompatActivity  {
         db.close();
     }
 
-    /* If the user have forgotten their login. This function does not work! */
+    /**
+     * Method which is called on when the users does not remember their log in information and
+     * has pressed the represented button. This function does not work!
+     *
+     * @param view  the layout
+     */
     public void forgotLogin(View view) {
+        alert("Unfortunately, this function does not work yet!");
+    }
+
+    /**
+     * Method for alerting the user with information with an pop up.
+     *
+     * @param message   The message to the user
+     */
+    public void alert(String message) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
-        dlgAlert.setMessage("Unfortunately, this function does not work yet!");
+        dlgAlert.setMessage(message);
         dlgAlert.setTitle("Oops");
         dlgAlert.setPositiveButton("OK", null);
         dlgAlert.setCancelable(false);
@@ -93,21 +111,31 @@ public class MainActivity extends AppCompatActivity  {
         dlgAlert.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 });
     }
 
-    /* If the user wants to register the RegisterActivity will start */
+    /**
+     * If the user wants to register and pressed the register button, the RegisterActivity will start.
+     *
+     * @see RegisterActivity
+     */
     public void register() {
         Intent intent = new Intent(context, RegisterActivity.class);
         startActivity(intent);
     }
 
-    /* If the user tries to log in their input will be controlled. When the input is accepted
-     * a new activity will start.
+    /**
+     * If the user tries to log in by pressing the log in button, their input will be controlled.
+     * When the input is accepted the next activity (StartPage) will start.
+     *
+     * @see StartPage
+     * @see SQLiteHelper#ifUserExists(String, String)
+     * @see SQLiteHelper#getUser(String)
+     * @see #alert(String)
      */
     public void logIn() {
+
         /* Get the user's text input */
         String username = usernameET.getText().toString();
         String password = passwordET.getText().toString();
@@ -115,7 +143,8 @@ public class MainActivity extends AppCompatActivity  {
         /* Control if user exists */
         if (db.ifUserExists(username, password)) {
 
-            /* A user object must be created so that the information about
+            /*
+             * A user object must be created so that the information about
              * the user is the same for the whole application.
              */
             user = db.getUser(username);
@@ -130,20 +159,7 @@ public class MainActivity extends AppCompatActivity  {
         }
         else {
             /* If the user doesn't exist an alertbox will inform the user */
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
-
-            dlgAlert.setMessage("The password or username is not correct, please try again!");
-            dlgAlert.setTitle("Wrong input");
-            dlgAlert.setPositiveButton("Try again", null);
-            dlgAlert.setCancelable(false);
-            dlgAlert.create().show();
-
-            dlgAlert.setPositiveButton("Try again",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+            alert("The password or username is not correct, please try again!");
         }
     }
 

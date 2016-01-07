@@ -1,10 +1,8 @@
 package com.example.gabriella.wanderlust;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -15,8 +13,15 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Class which handles the users account where the user is able to pick the countries he or she
- * has visited, and a total of visited countries will be shown.
+ * <h1>AccountActivity</h1>
+ *
+ * The AccountActivity class takes data from the database and generate a list of countries. Every
+ * country is represented as checkboxes which the user can select depending on where he/she has
+ * traveled. The program then counts the amount of checked boxes and displays the total in the
+ * activity.
+ *
+ * @author  Gabriella Thorén
+ * @version 1
  */
 
 public class AccountActivity extends AppCompatActivity {
@@ -35,7 +40,6 @@ public class AccountActivity extends AppCompatActivity {
     LinearLayout ll;
     TextView     total;
 
-
     /* List of countries */
     List<DBCountry> africa;
     List<DBCountry> asia;
@@ -45,12 +49,15 @@ public class AccountActivity extends AppCompatActivity {
     List<DBCountry> southAmerica;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /* Initialize the database */
         db = new SQLiteHelper(this);
+
+        /* Store all countries in database. setCountries store a list of countries in the database. */
+        db.setCountries();
 
         /* Get parameters which where passed through MainActitivy to get the current user */
         user = (DBUser)getIntent().getSerializableExtra("user");
@@ -68,17 +75,15 @@ public class AccountActivity extends AppCompatActivity {
             }
         });
 
-        /* Set total of visited countries */
+        /* Set total of visited countries via db.getTotalVisitedCountries which counts how many
+        * countries the user has checked. These are saved in the database. */
         total = (TextView) findViewById(R.id.total_countries);
         total.setText("" + db.getTotalVisitedCountries(user));
 
         /* Get LinearLayout to fill it with checkboxes */
         ll = (LinearLayout) findViewById(R.id.linear_country_layout);
 
-        /* Store all countries in database */
-        db.setCountries();
-
-        /* Get lists with all countries per continent */
+        /* Get lists with all countries per continent through the database */
         africa       = db.getAllCountriesAfrica();
         asia         = db.getAllCountriesAsia();
         europe       = db.getAllCountriesEurope();
@@ -118,23 +123,38 @@ public class AccountActivity extends AppCompatActivity {
 
     }
 
-    /* See if checkbox is selected or not */
+    /**
+     * Controls if a checkbox is selected or not by comparing the name of the checkbox (the country)
+     * with all components of the list containing all the user's visited countries which is stored
+     * in the database.
+     *
+     * @param  checkbox  the checkbox that is being controlled to see if the user has selected it
+     * @return           <code>true</code> if the checkbox is selected by the user
+     *                   <code>false</code> if the checkbox is not selected by the user
+     * @see              DBCountry
+     */
     public boolean controlCheckBoxes(DBCountry checkbox) {
 
         List <DBCountry> visited = db.getVisitedCountries(user);
 
         for (int i=0; i<visited.size(); i++) {
-
             if (checkbox.getCountry().equals(visited.get(i).getCountry())) {
                 return true;
             }
         }
-
         return false;
-
     }
 
-    /* Method which creates and places checkboxes in layout */
+    /**
+     * Method which creates and places checkboxes in the activity layout. The checkboxes represents
+     * countries which the user will be able to select to see how many countries he or she has
+     * visited.
+     *
+     * @param countries     List of countries to be made in to checkboxes
+     * @see                 CheckBox
+     * @see                 DBCountry
+     * @see                 #controlCheckBoxes(DBCountry)
+     */
     public void createCheckBoxes(final List<DBCountry> countries) {
 
         for (int i=0; i<countries.size(); i++) {
@@ -154,17 +174,25 @@ public class AccountActivity extends AppCompatActivity {
             cb.setAllCaps(true);
             cb.setElegantTextHeight(true);
 
-            /* Add checkbox to view */
+            /* Add checkbox to view with margins */
             ll.addView(cb, params);
 
             final DBCountry country = countries.get(i);
 
             /* Control if checkbox is selected or not */
             if (controlCheckBoxes(country)) {
+                /*
+                 * If it is the checkbox will be checked and the object will be updated with this
+                 * information
+                 */
                 cb.setChecked(true);
                 countries.get(i).setSelected(true);
             }
             else {
+                /*
+                 * If not the checkbox will be unchecked and the object will be updated on this
+                 * information
+                 */
                 cb.setChecked(false);
                 countries.get(i).setSelected(false);
             }
@@ -183,7 +211,21 @@ public class AccountActivity extends AppCompatActivity {
 
 
 
-    /* OnClickListener for checkbox */
+    /**
+     *  OnClickListener for checkbox. When a checkbox is clicked on, this method sets the checkboxes
+     *  status to either checked or unchecked depending on the previous status before the click.
+     *  If the checkbox gets checked, this information is added to the database, otherwice it is
+     *  deleted from the database.
+     *
+     *  Every time a checkbox is checked or unchecked, the number of total visited countries is
+     *  changed.
+     *
+     *  @param country  the checkbox which is being clicked on
+     *  @see            DBCountry
+     *  @see            SQLiteHelper#deleteVisitedCountry(DBUser, DBCountry)
+     *  @see            SQLiteHelper#createVisitedCountry(DBUser, DBCountry)
+     *  @see            SQLiteHelper#getTotalVisitedCountries(DBUser)
+     */
     public void checkOnClick(DBCountry country) {
 
         /* If the checkbox already is selected before the click */
@@ -210,7 +252,10 @@ public class AccountActivity extends AppCompatActivity {
         }
     }
 
-    /* Method that creates an underline to the layout */
+    /**
+     * Method which creates an underline to the layout. It is used to delimit the title (continent)
+     * with its content (country).
+     */
     public void createUnderline() {
         View underline = new View(this);
         LinearLayout.LayoutParams underlineMargin = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2);
@@ -220,7 +265,11 @@ public class AccountActivity extends AppCompatActivity {
         ll.addView(underline, underlineMargin);
     }
 
-    /* Method that creates the title for the continents and adds it to the layout */
+    /**
+     * Method that creates the title for the continents and adds it to the layout.
+     *
+     * @param title     the title to be created
+     */
     public void createTitle(String title) {
         TextView tv = new TextView(this);
         tv.setText(title);
@@ -230,7 +279,11 @@ public class AccountActivity extends AppCompatActivity {
     }
 
 
-    /* Method for start settings activity */
+    /*
+     * Method for start the settings activity. The activity require a {@link DBUser}.
+     *
+     * @see SettingsActivity
+     */
     public void settings() {
         Intent intent = new Intent(this, SettingsActivity.class);
         intent.putExtra("user", user);

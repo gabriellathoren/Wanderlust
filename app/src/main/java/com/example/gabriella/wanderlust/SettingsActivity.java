@@ -14,11 +14,16 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import java.util.Set;
 
 /**
- *  Class which handles the settings activity where the user is able to make changes in their
- *  saved information, delete their account or log out.
+ * <h1>SettingsActivity</h1>
+ *
+ *  This class handles the settings activity where the user is able to make changes in their
+ *  saved information, delete their account or log out from the application.
+ *
+ *  @author     Gabriella Thorén
+ *  @version    1
+ *
  */
 public class SettingsActivity extends AppCompatActivity {
 
@@ -58,7 +63,8 @@ public class SettingsActivity extends AppCompatActivity {
         /* Reuse the layout for adding new travels */
         setContentView(R.layout.activity_settings);
 
-        /* Change the button in toolbar to an OK-button which the user clicks on when
+        /*
+         * Change the button in toolbar to an OK-button which the user clicks on when
          * done with their input for updating travel.
          */
         saveButton = (ImageButton)findViewById(R.id.settings);
@@ -91,7 +97,20 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    /* OnClickListener for the save button */
+    /**
+     * OnClickListener for the save button. When the user is ready to change its settings and
+     * presses the save button, this method will control the user input. If there is something
+     * wrong with the input, the user will get alerted. If the input is correct, the user
+     * information will be updated.
+     *
+     * @see DBUser
+     * @see SQLiteHelper#ifUserExists(String)
+     * @see DBUser#getUsername()
+     * @see DBUser#getUserID()
+     * @see DBUser#getPassword()
+     * @see #alert(String)
+     * @see #update(DBUser)
+     */
     public void update() {
 
         /* Get user input */
@@ -148,6 +167,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method updates the user information in the database.
+     *
+     * @param updatedUser   the new user information, but with the same user id as before
+     * @see   SQLiteHelper#updateUser(DBUser)
+     */
     public void update(DBUser updatedUser) {
 
         db.updateUser(updatedUser);
@@ -160,6 +185,11 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Method which creates alert dialogs with messengers to the user.
+     *
+     * @param message   the message to the user
+     */
     public void alert(String message) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
 
@@ -177,10 +207,19 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-    /* Method which is called when user pressed the button for changing password */
+    /**
+     *  Method which is called when user pressed the button for changing password. If that button
+     *  is pressed the text fields for password changing is either shown or hided depending on its
+     *  previous state. Ff the text fields is shown, the deactivate button must be moved to make
+     *  room for the text fields.
+     *
+     *
+     *  @param view     layout
+     */
     public void changeButtonHandler(View view) {
 
-        /* Checks if it is the first click, otherwice the user must click twice before the isSelected
+        /*
+         * Checks if it is the first click, otherwice the user must click twice before the isSelected
          * becomes true.
          */
         if(firstClick) {
@@ -193,8 +232,12 @@ public class SettingsActivity extends AppCompatActivity {
         newPassword  = (EditText) findViewById(R.id.new_password);
         newPassword2 = (EditText) findViewById(R.id.new_password2);
 
+        /* To open change password */
         if(isSelected) {
+            /* Change the state to false */
             isSelected = false;
+
+            /* Make textfields visible */
             oldPassword .setVisibility(View.VISIBLE);
             newPassword .setVisibility(View.VISIBLE);
             newPassword2.setVisibility(View.VISIBLE);
@@ -202,12 +245,20 @@ public class SettingsActivity extends AppCompatActivity {
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                                             ViewGroup.LayoutParams.WRAP_CONTENT);
 
+            /*
+             * Set button for deactivating account bellow the password text fields to make room for
+             * the components that is now visible.
+             */
             p.addRule(RelativeLayout.BELOW, R.id.new_password2);
             deactivate.setLayoutParams(p);
 
         }
+        /* To close change password */
         else {
+            /* Change the state to true */
             isSelected = true;
+
+            /* Make textfield invisible */
             oldPassword .setVisibility(View.INVISIBLE);
             newPassword .setVisibility(View.INVISIBLE);
             newPassword2.setVisibility(View.INVISIBLE);
@@ -215,20 +266,39 @@ public class SettingsActivity extends AppCompatActivity {
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
 
+            /*
+             * Set button for deactivating account bellow the password text fields delete the space
+             * where the password text fields was.
+             */
             p.addRule(RelativeLayout.BELOW, R.id.change_password);
             deactivate.setLayoutParams(p);
         }
 
     }
 
-    /* Method for logging out */
+    /**
+     *  Method for logging out the user. This method is called when the user has pressed the
+     *  log out button. The user is then taken to the log in activity.
+     *
+     *  @param view     layout
+     *  @see            MainActivity
+     */
     public void logOut(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
-    /* Method for deactivating account */
+    /**
+     * Method for deactivating account which is called when the user has pressed the button for
+     * deactivating account. The user gets alerted about the processes to assure that it is what
+     * the user really wants to do before deleting the user from the application. When that is done
+     * the user gets pulled back to the log in activity.
+     *
+     * @param view  layout
+     * @see         MainActivity
+     * @see         SQLiteHelper#deleteUser(DBUser)
+     */
     public void deactivateAccount(View view) {
         /* AlertDialog to be sure that user wants to delete the travel */
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);

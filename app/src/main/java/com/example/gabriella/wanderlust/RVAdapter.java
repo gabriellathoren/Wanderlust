@@ -1,35 +1,35 @@
 package com.example.gabriella.wanderlust;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.opengl.GLES10;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import javax.microedition.khronos.opengles.GL10;
 
 /**
+ * <h1>RVAdapter</h1>
+ *
  *  Adapter that follows the view holder design pattern and reuses the card view layout (item.xml).
+ *  The class is used for displaying the user's coming travels in a CardView/RecycleView.
+ *
+ *  @author     Gabriella Thorén
+ *  @version    1
+ *
  */
+
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> implements Serializable{
 
+    /* List of travels */
     private List<DBTravel> travels;
 
     /* Return the number of items present in the data. */
@@ -53,8 +53,17 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
     }
 
 
-    /* Specifies the contents of each item of the RecyclerView. Sets the values of the title, days,
+    /**
+     * Specifies the contents of each item of the RecyclerView. Sets the values of the title, days,
      * and background fields of the CardView.
+     *
+     * @param     travelViewHolder  the holder of the CardView and its components
+     * @param     position          the position of the item in the list of DBTravel, which is shown
+     *                              in the layout
+     * @exception OutOfMemoryError
+     * @see       DBTravel
+     * @see       DBTravel#getTravelID()
+     * @see       DBUser
      */
     @Override
     public void onBindViewHolder(TravelViewHolder travelViewHolder, int position) {
@@ -72,15 +81,21 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         /* Today's date */
         Calendar today = Calendar.getInstance();
 
+        /* Days left to the travel */
         long diff = thatDay.getTimeInMillis() - today.getTimeInMillis();
         long days = diff / (24 * 60 * 60 * 1000);
 
+        /* Set text with the total amount of days left to the travel */
         travelViewHolder.days.setText(String.valueOf(days));
         try {
+            /* Set the image of the travel in the layout */
             travelViewHolder.background.setImageBitmap(t.getWallpaper());
         }
         catch (OutOfMemoryError e) {}
 
+        /* OnClickListener to every item (travel) in the list. If one is pressed, the TravelPage
+         * is called on which shows the information of the specific travel.
+         */
         travelViewHolder.background.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,9 +108,12 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
 
     }
 
-    /* This method is called when the custom ViewHolder needs to be initialized. Each item of the
-     * RecyclerView should get used. This is done by inflating the layout using LayoutInflater,
-     * passing the output to the constructor of the custom ViewHolder
+    /**
+     * This method is called when the ViewHolder needs to be initialized. The method sets the layout
+     * to the item layout, which is the layout for every row in the CardView, to the activity.
+     *
+     * @param viewGroup  the view group of the layout
+     * @param i          the position of the item (travel) in the list
      */
     @Override
     public TravelViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -103,7 +121,9 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         return new TravelViewHolder(v);
     }
 
-    /* Create the adapter */
+    /**
+     *  The method creates an adapter and initialize the components of the card view.
+     */
     public static class TravelViewHolder extends RecyclerView.ViewHolder {
 
         protected CardView  cv;
@@ -121,6 +141,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TravelViewHolder> 
         }
     }
 
+    /**
+     * Connects to the RecyclerView
+     *
+     * @param recyclerView      the recycler view which the travel list will be displayed in
+     */
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
