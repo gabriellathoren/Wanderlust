@@ -1,6 +1,7 @@
 package com.example.gabriella.wanderlust;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -22,7 +23,6 @@ import java.util.List;
  *
  * @author  Gabriella Thorén
  * @version 1
- *
  *
  *
  * Wanderlust - the application that keeps track of your travels.
@@ -57,6 +57,7 @@ public class AccountActivity extends AppCompatActivity {
 
     /* Components */
     ImageButton  settings;
+    ImageButton  return_button;
     LinearLayout ll;
     TextView     total;
 
@@ -88,12 +89,9 @@ public class AccountActivity extends AppCompatActivity {
         /* Change the icon for user account to settings */
         settings = (ImageButton)findViewById(R.id.settings);
         settings.setBackgroundResource(R.drawable.ic_settings_white_24dp);
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settings();
-            }
-        });
+
+        /* Initialize return_button */
+        return_button = (ImageButton) findViewById(R.id.return_button);
 
         /* Set total of visited countries via db.getTotalVisitedCountries which counts how many
         * countries the user has checked. These are saved in the database. */
@@ -140,6 +138,27 @@ public class AccountActivity extends AppCompatActivity {
         createTitle("South America");
         createUnderline();
         createCheckBoxes(southAmerica);
+
+        setOnClickListeners();
+    }
+
+    public void setOnClickListeners() {
+
+        /* Set onClickListener for settings-button */
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                settings();
+            }
+        });
+
+        /* Set onClickListener to return button */
+        return_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
     }
 
@@ -315,5 +334,19 @@ public class AccountActivity extends AppCompatActivity {
         super.onStart();
     }
 
+    /**
+     * Override method that is called on when user presses the return button. The method return
+     * the user to the StartPage.
+     *
+     * @see DBUser
+     * @see StartPage
+     */
+    @Override
+    public void onBackPressed() {
+        /* Go back to the StartPage */
+        Intent intent = new Intent(this, StartPage.class);
+        intent.putExtra("user", user);
+        startActivity(intent);
+    }
 
 }

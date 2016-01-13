@@ -186,4 +186,13 @@ public class MainActivity extends AppCompatActivity  {
         super.onStart();
     }
 
+
+    /**
+     * Override method that is called on when user presses the return button. The method is empty
+     * because the user is not allowed to return to previous activity from the log in activity. This
+     * to prevent users from logging out from their account and returning without logging in.      *
+     */
+    @Override
+    public void onBackPressed() {}
+
 }

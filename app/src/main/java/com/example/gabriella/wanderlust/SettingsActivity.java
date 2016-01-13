@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.util.Set;
+
 
 /**
  * <h1>SettingsActivity</h1>
@@ -58,6 +60,7 @@ public class SettingsActivity extends AppCompatActivity {
     /* Components */
     RelativeLayout rl;
     ImageButton   saveButton;
+    ImageButton   return_button;
     EditText      firstname;
     EditText      sirname;
     EditText      username;
@@ -97,13 +100,22 @@ public class SettingsActivity extends AppCompatActivity {
         );
 
         /* Initialize components with their respective xml-code */
-        firstname    = (EditText) findViewById(R.id.first_name);
-        sirname      = (EditText) findViewById(R.id.sir_name);
-        username     = (EditText) findViewById(R.id.username);
-        deactivate   = (Button)   findViewById(R.id.deactivate_account);
-        oldPassword  = (EditText) findViewById(R.id.old_password);
-        newPassword  = (EditText) findViewById(R.id.new_password);
-        newPassword2 = (EditText) findViewById(R.id.new_password2);
+        firstname     = (EditText)    findViewById(R.id.first_name);
+        sirname       = (EditText)    findViewById(R.id.sir_name);
+        username      = (EditText)    findViewById(R.id.username);
+        deactivate    = (Button)      findViewById(R.id.deactivate_account);
+        oldPassword   = (EditText)    findViewById(R.id.old_password);
+        newPassword   = (EditText)    findViewById(R.id.new_password);
+        newPassword2  = (EditText)    findViewById(R.id.new_password2);
+        return_button = (ImageButton) findViewById(R.id.return_button);
+
+        /* Set onClickListener to return button */
+        return_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         /* Set EditTexts with data */
         firstname.setText(user.getFirstName());
@@ -303,9 +315,33 @@ public class SettingsActivity extends AppCompatActivity {
      *  @see            MainActivity
      */
     public void logOut(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
+
+        /* AlertDialog to be sure that user wants to delete the travel */
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+        alertDialogBuilder.setTitle("Log out");
+        alertDialogBuilder
+                .setMessage("Are you sure you want to log out?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+
+                        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        /* create alert dialog and show it */
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+
     }
 
     /**
@@ -348,5 +384,97 @@ public class SettingsActivity extends AppCompatActivity {
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
+
+
+    /**
+     * Override method which is called when the user is trying to return to previous page. If the
+     * user has made changes to the travel, an alert dialog will warn the user of his or hers
+     * actions to make sure that important changes is not lost before returning to previous activity.
+     *
+     * @see DBUser
+     */
+
+    @Override
+    public void onBackPressed() {
+
+
+        if( (!user.getFirstName().matches(firstname.getText().toString())) ||
+            (!user.getLastName() .matches(sirname  .getText().toString())) ||
+            (!user.getUsername() .matches(username .getText().toString()))) {
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            alertDialogBuilder.setTitle("Exit");
+            alertDialogBuilder
+                    .setMessage("Are you sure you want go back to the previous page? Your changes will not be saved.")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+
+                           /* Go back to the StartPage when the new travel has been stored in the database */
+                            Intent intent = new Intent(SettingsActivity.this, AccountActivity.class);
+                            intent.putExtra("user", user);
+                            startActivity(intent);
+
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+                /* create alert dialog and show it */
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+
+        }
+
+        /* Check if user has tried to change password */
+        else if( (oldPassword.getVisibility() == View.VISIBLE)  &&
+                (!oldPassword.getText().toString().matches("")) &&
+                (!newPassword.getText().toString().matches("")) &&
+                (!newPassword.getText().toString().matches(""))) {
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+                alertDialogBuilder.setTitle("Exit");
+                alertDialogBuilder
+                        .setMessage("Are you sure you want go back to the previous page? Your changes will not be saved.")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+
+                               /* Go back to the AccountActivity when the new travel has been stored in the database */
+                                Intent intent = new Intent(SettingsActivity.this, AccountActivity.class);
+                                intent.putExtra("user", user);
+                                startActivity(intent);
+
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                /* create alert dialog and show it */
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+
+        }
+        else{
+            /* Go back to the AccountActivity when the new travel has been stored in the database */
+            Intent intent = new Intent(SettingsActivity.this, AccountActivity.class);
+            intent.putExtra("user", user);
+            startActivity(intent);
+        }
+    }
+
+
+
+
 
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -69,6 +70,7 @@ public class TravelPage extends AppCompatActivity {
 
     /* Components */
     ImageButton saveButton;
+    ImageButton return_button;
     EditText    travelTitle;
     DatePicker  datePicker;
     ImageView   wallpaper;
@@ -98,20 +100,16 @@ public class TravelPage extends AppCompatActivity {
         setContentView(R.layout.activity_add);
 
         /* Initiate components with the related xml-components */
-        datePicker  = (DatePicker) findViewById(R.id.travel_date_picker);
-        travelTitle = (EditText)   findViewById(R.id.travel_title);
-        wallpaper   = (ImageView)  findViewById(R.id.backgroundSetter);
-        remove      = (ImageButton)findViewById(R.id.remove_button);
-        delete      = (Button)     findViewById(R.id.delete_button);
+        datePicker    = (DatePicker)  findViewById(R.id.travel_date_picker);
+        travelTitle   = (EditText)    findViewById(R.id.travel_title);
+        wallpaper     = (ImageView)   findViewById(R.id.backgroundSetter);
+        remove        = (ImageButton) findViewById(R.id.remove_button);
+        delete        = (Button)      findViewById(R.id.delete_button);
+        return_button = (ImageButton) findViewById(R.id.return_button);
 
-        /* Make delete button visible */
-        delete.setVisibility(View.VISIBLE);
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                delete();
-            }
-        });
+        /* Make delete and return button visible */
+        delete       .setVisibility(View.VISIBLE);
+        return_button.setVisibility(View.VISIBLE);
 
         /*
          * Change the settings button in toolbar to an OK-button which the user clicks on when
@@ -120,13 +118,8 @@ public class TravelPage extends AppCompatActivity {
         saveButton = (ImageButton)findViewById(R.id.settings);
         saveButton.setBackgroundResource(R.drawable.ic_check_box_white_24dp);
 
-        /* Set onClickListener to button */
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                save();
-            }
-        });
+        /* Set onclicklisteners via method to minimize code in onCreate */
+        setOnclickListeners();
 
         /* Set DatePicker to travel date */
         int year  = travel.getYear();
@@ -145,18 +138,63 @@ public class TravelPage extends AppCompatActivity {
 
             /* Set visibility on remove image button if there are a image in ImageView */
             remove.setVisibility(View.VISIBLE);
-            remove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    removeImage();
-                    }
-                });
+
         }
         else {
             /* If there isn't a stored background */
             Bitmap image = BitmapFactory.decodeResource(this.getResources(), R.drawable.image);
             wallpaper.setImageBitmap(image);
+
+            /*
+             * Set visibility of remove-button for removing picture to invisible if there is not
+             * a wallpaper.
+             */
+            remove.setVisibility(View.INVISIBLE);
         }
+    }
+
+    /**
+     * Method that sets onClickListeners to various elements in the layout
+     *
+     * @see #removeImage()
+     * @see #save()
+     *
+     */
+    public void setOnclickListeners() {
+
+        /* Set OnClickListener to remove-button */
+        remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeImage();
+            }
+        });
+
+        /* Set onClickListener to button */
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                save();
+            }
+        });
+
+        /* Set onClickListener to delete button */
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                delete();
+            }
+        });
+
+        /* Set onClickListener to return button */
+        return_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+
     }
 
     @Override
@@ -197,8 +235,8 @@ public class TravelPage extends AppCompatActivity {
                         TravelPage.this.finish();
                     }
                 })
-                .setNegativeButton("No",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
                 });
@@ -217,12 +255,17 @@ public class TravelPage extends AppCompatActivity {
      *
      */
     public void removeImage() {
-        db.deleteWallpaper(travel);
+        /*
+         * Set visibility of remove-button for removing picture to invisible if there is not
+         * a wallpaper.
+         */
+        remove.setVisibility(View.INVISIBLE);
 
         /* Default ImageView */
         Bitmap image = BitmapFactory.decodeResource(this.getResources(), R.drawable.image);
         wallpaper.setImageBitmap(image);
 
+        /* Set picture path to null */
         picturePath = null;
 
     }
@@ -285,6 +328,16 @@ public class TravelPage extends AppCompatActivity {
             else {
                 /* If the user didn't select an image */
                 updatedTravel = new DBTravel(travel.getTravelID(), title, year, month, day);
+
+                /*
+                 * If the user did not select an image as wallpaper, but had one before, that
+                 * need to get removed. It should not get removed before the user presses the
+                 * save-button, just in case the user changes his/hers mind.
+                 */
+                if(travel.getPicturePath() != picturePath) {
+                    db.deleteWallpaper(travel);
+                }
+
             }
 
             /* Insert the values in database */
@@ -356,6 +409,60 @@ public class TravelPage extends AppCompatActivity {
             /* Set visibility on remove image button if there are a image in ImageView */
             remove.setVisibility(View.VISIBLE);
 
+        }
+    }
+
+    /**
+     * Override method which is called when the user is trying to return to previous page. If the
+     * user has made changes to the travel, an alert dialog will warn the user of his or hers
+     * actions to make sure that important changes is not lost before returning to previous activity.
+     *
+     * @see DBUser
+     */
+
+    @Override
+    public void onBackPressed() {
+
+        /* Check if user has made changes to the information */
+        if( (travel.getYear()  != datePicker.getYear()      ) ||
+            (travel.getMonth() != datePicker.getMonth()     ) ||
+            (travel.getDay()   != datePicker.getDayOfMonth()) ||
+            (!travelTitle.getText().toString().matches(travel.getTitle())) ||
+            (travel.getPicturePath() != picturePath)) {
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            alertDialogBuilder.setTitle("Exit");
+            alertDialogBuilder
+                    .setMessage("Are you sure you want return to the previous page? Your changes will not be saved.")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+
+                           /* Go back to the StartPage when the new travel has been stored in the database */
+                            Intent intent = new Intent(TravelPage.this, StartPage.class);
+                            intent.putExtra("user", user);
+                            startActivity(intent);
+
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            /* create alert dialog and show it */
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+        else {
+            /* Go back to the StartPage */
+            Intent intent = new Intent(this, StartPage.class);
+            intent.putExtra("user", user);
+            startActivity(intent);
         }
     }
 }

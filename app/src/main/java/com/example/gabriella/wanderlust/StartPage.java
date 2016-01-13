@@ -55,6 +55,7 @@ public class StartPage extends AppCompatActivity {
     RecyclerView   rv;
     RVAdapter      ra;
     ImageButton    account;
+    ImageButton    return_button;
 
     /* Current user */
     DBUser user;
@@ -103,6 +104,9 @@ public class StartPage extends AppCompatActivity {
             }
         });
 
+        /* Hide the return-button */
+        return_button = (ImageButton)findViewById(R.id.return_button);
+        return_button.setVisibility(View.INVISIBLE);
 
     }
 
@@ -114,6 +118,7 @@ public class StartPage extends AppCompatActivity {
      *  @see DBUser
      */
     public void account() {
+        findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
         Intent intent = new Intent(this, AccountActivity.class);
         intent.putExtra("user", user);
         startActivity(intent);
@@ -160,5 +165,15 @@ public class StartPage extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
     }
+
+
+    /**
+     * Override method that is called when the user presses the back button. The method removes the
+     * ability to return to the previous activity from the StartPage.
+     *
+     * @see DBUser
+     */
+    @Override
+    public void onBackPressed() {}
 
 }

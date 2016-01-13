@@ -70,6 +70,7 @@ public class AddActivity extends AppCompatActivity {
 
     /* Components */
     ImageButton imageButton;
+    ImageButton return_button;
     EditText    travelTitle;
     DatePicker  datePicker;
     ImageView   wallpaper;
@@ -97,15 +98,16 @@ public class AddActivity extends AppCompatActivity {
         user = (DBUser)getIntent().getSerializableExtra("user");
 
         /* Initialize components with the related xml-components */
-        datePicker  = (DatePicker)  findViewById(R.id.travel_date_picker);
-        travelTitle = (EditText)    findViewById(R.id.travel_title);
-        remove      = (ImageButton) findViewById(R.id.remove_button);
-        remove.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeImage();
-            }
-        });
+        datePicker    = (DatePicker)  findViewById(R.id.travel_date_picker);
+        travelTitle   = (EditText)    findViewById(R.id.travel_title);
+        remove        = (ImageButton) findViewById(R.id.remove_button);
+        return_button = (ImageButton) findViewById(R.id.return_button);
+
+        /*
+         * Set visibility of remove-button for removing picture to invisible if there is not
+         * a wallpaper.
+         */
+        remove.setVisibility(View.INVISIBLE);
 
         /*
          * Change the settings button in toolbar to an OK-button which the user clicks on when
@@ -113,6 +115,18 @@ public class AddActivity extends AppCompatActivity {
          */
         imageButton = (ImageButton)findViewById(R.id.settings);
         imageButton.setBackgroundResource(R.drawable.ic_check_box_white_24dp);
+
+        setOnclickListeners();
+    }
+
+    /**
+     * Method that sets onClickListeners to various elements in the layout
+     *
+     * @see #removeImage()
+     * @see #onBackPressed()
+     */
+    public void setOnclickListeners() {
+
         imageButton.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) {
@@ -120,6 +134,21 @@ public class AddActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeImage();
+            }
+        });
+
+        /* Set onClickListener to return button */
+        return_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
     }
 
@@ -201,6 +230,14 @@ public class AddActivity extends AppCompatActivity {
      */
     public void removeImage() {
 
+        /*
+         * Set visibility of remove-button for removing picture to invisible if there is not
+         * a wallpaper.
+         */
+        remove.setVisibility(View.INVISIBLE);
+
+        picturePath = null;
+
         /* Default ImageView */
         Bitmap image = BitmapFactory.decodeResource(this.getResources(), R.drawable.image);
         wallpaper.setImageBitmap(image);
@@ -278,6 +315,50 @@ public class AddActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        /* Check if user has made any new input */
+        if( (!travelTitle.getText().toString().matches("")) || (picturePath != null)) {
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            alertDialogBuilder.setTitle("Exit");
+            alertDialogBuilder
+                    .setMessage("Are you sure you want return to the previous page? Your changes will not be saved.")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+
+                            /* Go back to the StartPage */
+                            Intent intent = new Intent(AddActivity.this, StartPage.class);
+                            intent.putExtra("user", user);
+                            startActivity(intent);
+
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+            /* create alert dialog and show it */
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+        else {
+            /* Go back to the StartPage */
+            Intent intent = new Intent(this, StartPage.class);
+            intent.putExtra("user", user);
+            startActivity(intent);
+        }
+
     }
 
 }
