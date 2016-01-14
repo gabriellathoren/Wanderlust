@@ -289,7 +289,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_USERNAME,   user.getUsername());
+        values.put(KEY_USER_USERNAME, user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
         values.put(KEY_USER_LAST_NAME,  user.getLastName());
@@ -332,7 +332,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_USERNAME,   user.getUsername());
         values.put(KEY_USER_PASSWORD,   user.getPassword());
         values.put(KEY_USER_FIRST_NAME, user.getFirstName());
-        values.put(KEY_USER_LAST_NAME,  user.getLastName());
+        values.put(KEY_USER_LAST_NAME, user.getLastName());
 
         db.update(TABLE_USER, values, KEY_USER_ID + " = ?", new String[]{String.valueOf(user.getUserID())});
 
@@ -460,7 +460,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
         values.put(KEY_TRAVEL_DAY,       travel.getDay());
         values.put(KEY_TRAVEL_WALLPAPER, travel.getPicturePath());
-        values.put(KEY_USER_ID,          user.getUserID());
+        values.put(KEY_USER_ID, user.getUserID());
 
         /* Insert row to the table user*/
         db.insert(TABLE_TRAVEL, null, values);
@@ -515,7 +515,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TRAVEL_TITLE,     travel.getTitle());
+        values.put(KEY_TRAVEL_TITLE, travel.getTitle());
         values.put(KEY_TRAVEL_YEAR,      travel.getYear());
         values.put(KEY_TRAVEL_MONTH,     travel.getMonth());
         values.put(KEY_TRAVEL_DAY, travel.getDay());
@@ -676,9 +676,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         List<DBCountry> countries = new ArrayList<>();
 
         String selectQuery = ("SELECT "   + KEY_COUNTRY_NAME      + " "
-                           +  "FROM "     + TABLE_COUNTRY         + " "
-                           +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
-                           +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
+                +  "FROM "     + TABLE_COUNTRY         + " "
+                +  "WHERE "    + KEY_COUNTRY_CONTINENT + "= 'Africa' "
+                +  "ORDER BY " + KEY_COUNTRY_NAME      + " ASC");
 
         Log.e(LOG, selectQuery);
         Cursor c = db.rawQuery(selectQuery, null);

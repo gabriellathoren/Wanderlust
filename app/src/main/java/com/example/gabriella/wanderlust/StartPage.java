@@ -118,7 +118,6 @@ public class StartPage extends AppCompatActivity {
      *  @see DBUser
      */
     public void account() {
-        findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
         Intent intent = new Intent(this, AccountActivity.class);
         intent.putExtra("user", user);
         startActivity(intent);
